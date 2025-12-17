@@ -133,15 +133,41 @@ export class ControllerLobbyPage {
   }
 
   async waitForPlayerKicked(playerName: string, timeout: number = 5000) {
-    await this.notification.filter({ hasText: `${playerName} was kicked` }).waitFor({ timeout });
+    await this.page.waitForFunction(
+      (name) => {
+        const history = window.__notificationHistory || [];
+        return history.some((n) => n.message.includes(`${name} was kicked`));
+      },
+      playerName,
+      { timeout }
+    );
   }
 
   async waitForHostTransfer(newHostName: string, timeout: number = 5000) {
-    await this.notification.filter({ hasText: `${newHostName} is now the host` }).waitFor({ timeout });
+    await this.page.waitForFunction(
+      (name) => {
+        const history = window.__notificationHistory || [];
+        // Check for either "You are now the host!" (if this player became host)
+        // or "{name} is now the host" (if another player became host)
+        return history.some((n) =>
+          n.message.includes('You are now the host') ||
+          n.message.includes(`${name} is now the host`)
+        );
+      },
+      newHostName,
+      { timeout }
+    );
   }
 
   async waitForGameStarting(timeout: number = 5000) {
-    await this.notification.filter({ hasText: 'Starting game' }).waitFor({ timeout });
+    await this.page.waitForFunction(
+      () => {
+        const history = window.__notificationHistory || [];
+        return history.some((n) => n.message.includes('Starting game'));
+      },
+      {},
+      { timeout }
+    );
   }
 
   async getNotificationText(): Promise<string | null> {

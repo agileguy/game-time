@@ -129,18 +129,46 @@ export class DisplayLobbyPage {
   }
 
   async waitForPlayerJoinMessage(playerName: string, timeout: number = 5000) {
-    await this.statusMessage.filter({ hasText: `${playerName} joined!` }).waitFor({ timeout });
+    await this.page.waitForFunction(
+      (name) => {
+        const history = window.__notificationHistory || [];
+        return history.some((n) => n.message.includes(`${name} joined!`));
+      },
+      playerName,
+      { timeout }
+    );
   }
 
   async waitForPlayerLeaveMessage(playerName: string, timeout: number = 5000) {
-    await this.statusMessage.filter({ hasText: `${playerName} left` }).waitFor({ timeout });
+    await this.page.waitForFunction(
+      (name) => {
+        const history = window.__notificationHistory || [];
+        return history.some((n) => n.message.includes(`${name} left`));
+      },
+      playerName,
+      { timeout }
+    );
   }
 
   async waitForHostTransferMessage(newHostName: string, timeout: number = 5000) {
-    await this.statusMessage.filter({ hasText: `${newHostName} is now the host` }).waitFor({ timeout });
+    await this.page.waitForFunction(
+      (name) => {
+        const history = window.__notificationHistory || [];
+        return history.some((n) => n.message.includes(`${name} is now the host`));
+      },
+      newHostName,
+      { timeout }
+    );
   }
 
   async waitForGameStartingMessage(timeout: number = 5000) {
-    await this.statusMessage.filter({ hasText: 'Game Starting!' }).waitFor({ timeout });
+    await this.page.waitForFunction(
+      () => {
+        const history = window.__notificationHistory || [];
+        return history.some((n) => n.message.includes('Game Starting!'));
+      },
+      {},
+      { timeout }
+    );
   }
 }

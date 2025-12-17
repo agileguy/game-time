@@ -98,7 +98,9 @@ async def websocket_endpoint(
                 "is_host": player.is_host,
             },
         }
-        logger.info(f"Player {player_id} broadcasting player_joined to room {room_code}: {player_joined_msg}")
+        logger.info(
+            f"Player {player_id} broadcasting player_joined to room {room_code}: {player_joined_msg}"
+        )
         try:
             await connection_manager.broadcast_to_room(
                 message=player_joined_msg,
@@ -114,14 +116,12 @@ async def websocket_endpoint(
         logger.info(f"Broadcasting updated room state to all players in room {room_code}")
         try:
             await send_room_state_to_all(room, room_code, room_manager, player_manager)
-            logger.info(f"Room state broadcast complete")
+            logger.info("Room state broadcast complete")
         except Exception as e:
             logger.error(f"Failed to broadcast room state: {e}", exc_info=True)
 
         # Start heartbeat task
-        heartbeat_task = asyncio.create_task(
-            send_heartbeat(websocket, connection_id, player_id)
-        )
+        heartbeat_task = asyncio.create_task(send_heartbeat(websocket, connection_id, player_id))
 
         # Message loop
         logger.info(f"Player {player_id} entering message loop")
@@ -156,7 +156,11 @@ async def websocket_endpoint(
                 # WebSocket is broken, exit the loop
                 break
             except Exception as e:
-                logger.error(f"Error handling message for player {player_id}: {e}", extra={"session_id": session_id}, exc_info=True)
+                logger.error(
+                    f"Error handling message for player {player_id}: {e}",
+                    extra={"session_id": session_id},
+                    exc_info=True,
+                )
                 try:
                     await connection_manager.send_error("Internal error", connection_id)
                 except Exception:
@@ -166,10 +170,16 @@ async def websocket_endpoint(
                 await db.rollback()
 
     except WebSocketDisconnect as e:
-        logger.info(f"Player {player_id} WebSocket disconnected normally (outer): code={getattr(e, 'code', 'N/A')}, reason={getattr(e, 'reason', 'N/A')}")
+        logger.info(
+            f"Player {player_id} WebSocket disconnected normally (outer): code={getattr(e, 'code', 'N/A')}, reason={getattr(e, 'reason', 'N/A')}"
+        )
         pass
     except Exception as e:
-        logger.error(f"WebSocket error for player {player_id}: {e}", extra={"session_id": session_id}, exc_info=True)
+        logger.error(
+            f"WebSocket error for player {player_id}: {e}",
+            extra={"session_id": session_id},
+            exc_info=True,
+        )
     finally:
         # Cleanup
         logger.info(f"WebSocket cleanup starting for player {player_id}")
@@ -214,14 +224,17 @@ async def websocket_endpoint(
                     if room:
                         # Import Optional and Player for type hints
                         from app.models.player import Player as PlayerModel
-                        new_host: Optional[PlayerModel] = await room_manager._transfer_host(room)
+
+                        new_host: PlayerModel | None = await room_manager._transfer_host(room)
                         await db.commit()
 
                         # Refresh room to get latest state
                         await db.refresh(room)
 
                         if new_host:
-                            logger.info(f"Host transferred to player {new_host.id} ({new_host.name})")
+                            logger.info(
+                                f"Host transferred to player {new_host.id} ({new_host.name})"
+                            )
                             # Broadcast host transfer event
                             await connection_manager.broadcast_to_room(
                                 message={
@@ -238,10 +251,14 @@ async def websocket_endpoint(
                 try:
                     room = await room_manager.get_room_by_code(room_code)
                     if room:
-                        logger.info(f"Broadcasting updated room state after player {player_id} left")
+                        logger.info(
+                            f"Broadcasting updated room state after player {player_id} left"
+                        )
                         await send_room_state_to_all(room, room_code, room_manager, player_manager)
                 except Exception as e:
-                    logger.error(f"Failed to broadcast room state after player left: {e}", exc_info=True)
+                    logger.error(
+                        f"Failed to broadcast room state after player left: {e}", exc_info=True
+                    )
 
                 logger.info(f"WebSocket cleanup complete for player {player_id}")
 
@@ -315,7 +332,9 @@ async def send_room_state_to_all(
     ]
 
     # Log player connection statuses
-    logger.info(f"Broadcasting room {room.code} state with players: {[(p.name, p.connected) for p in players]}")
+    logger.info(
+        f"Broadcasting room {room.code} state with players: {[(p.name, p.connected) for p in players]}"
+    )
 
     # Build room state
     room_state = RoomState(
@@ -453,7 +472,9 @@ async def handle_message(
             try:
                 # Get player name before kicking
                 target_player = await player_manager.get_player_by_id(target_player_id)
-                target_player_name = target_player.name if target_player else f"Player {target_player_id}"
+                target_player_name = (
+                    target_player.name if target_player else f"Player {target_player_id}"
+                )
 
                 await room_manager.kick_player(
                     room_id=message.data.get("room_id"),

@@ -23,6 +23,11 @@ export class NotificationManager {
   constructor() {
     this.container = null;
     this.notifications = [];
+    this.notificationHistory = [];
+
+    // Expose notification history for tests
+    window.__notificationHistory = this.notificationHistory;
+
     this.init();
   }
 
@@ -47,6 +52,13 @@ export class NotificationManager {
    */
   show(message, type = NotificationType.INFO, duration = CONFIG.ui.toastDuration) {
     const id = `notification-${Date.now()}-${Math.random()}`;
+
+    // Store notification in history for test access
+    this.notificationHistory.push({
+      message,
+      type,
+      timestamp: Date.now(),
+    });
 
     const notification = dom.createElement('div', {
       className: `notification notification-${type} fade-in`,

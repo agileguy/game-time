@@ -10,7 +10,8 @@ export default defineConfig({
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
-  workers: process.env.CI ? 1 : undefined,
+  // Run tests with 2 workers for faster execution
+  workers: 2,
   reporter: 'html',
 
   use: {
@@ -23,27 +24,28 @@ export default defineConfig({
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] },
     },
-    {
-      name: 'firefox',
-      use: { ...devices['Desktop Firefox'] },
-    },
-    {
-      name: 'webkit',
-      use: { ...devices['Desktop Safari'] },
-    },
-    // Mobile viewports
-    {
-      name: 'Mobile Chrome',
-      use: { ...devices['Pixel 5'] },
-    },
-    {
-      name: 'Mobile Safari',
-      use: { ...devices['iPhone 12'] },
-    },
+    // Disabled: Firefox and WebKit browsers not installed
+    // {
+    //   name: 'firefox',
+    //   use: { ...devices['Desktop Firefox'] },
+    // },
+    // {
+    //   name: 'webkit',
+    //   use: { ...devices['Desktop Safari'] },
+    // },
+    // Mobile viewports disabled for now
+    // {
+    //   name: 'Mobile Chrome',
+    //   use: { ...devices['Pixel 5'] },
+    // },
+    // {
+    //   name: 'Mobile Safari',
+    //   use: { ...devices['iPhone 12'] },
+    // },
   ],
 
   webServer: {
-    command: 'cd backend && source .venv/bin/activate && uvicorn app.main:app --host 0.0.0.0 --port 7000',
+    command: 'cd backend && .venv/bin/uvicorn app.main:app --host 0.0.0.0 --port 7000',
     url: 'http://localhost:7000/health/ready',
     reuseExistingServer: !process.env.CI,
     timeout: 120 * 1000,

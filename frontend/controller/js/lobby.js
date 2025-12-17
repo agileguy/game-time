@@ -387,16 +387,27 @@ class LobbyController {
    */
   handleLeaveRoom() {
     if (confirm('Leave this room?')) {
-      // Disconnect WebSocket
-      if (this.ws) {
-        this.ws.disconnect();
+      // Send leave room message to backend
+      if (this.ws && this.ws.isConnected()) {
+        this.ws.send('leave_room');
+
+        // Give the message time to send before disconnecting
+        setTimeout(() => {
+          if (this.ws) {
+            this.ws.disconnect();
+          }
+
+          // Clear session data
+          storage.clearAll();
+
+          // Redirect to join page
+          window.location.href = 'join.html';
+        }, 100);
+      } else {
+        // If not connected, just clear and redirect
+        storage.clearAll();
+        window.location.href = 'join.html';
       }
-
-      // Clear session data
-      storage.clearAll();
-
-      // Redirect to join page
-      window.location.href = 'join.html';
     }
   }
 

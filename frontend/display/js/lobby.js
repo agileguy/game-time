@@ -15,6 +15,12 @@ class DisplayLobbyController {
     this.sessionId = null;
     this.roomCode = null;
     this.countdownTimer = null;
+    this.statusMessageTimer = null;
+    this.notificationHistory = [];
+
+    // Expose notification history for tests
+    window.__notificationHistory = this.notificationHistory;
+
     this.init();
   }
 
@@ -154,6 +160,7 @@ class DisplayLobbyController {
     // Game starting
     this.ws.on('game_starting', (data) => {
       logger.info('Game starting:', data);
+      this.handleGameStarting();
       this.startCountdown(data.countdown || 3);
     });
 
@@ -289,13 +296,27 @@ class DisplayLobbyController {
    * @param {number} duration - Duration in ms (0 for permanent)
    */
   showStatusMessage(message, duration = 0) {
+    // Store notification in history for test access
+    this.notificationHistory.push({
+      message,
+      timestamp: Date.now(),
+      type: 'status',
+    });
+
     this.elements.statusMessage.textContent = message;
     this.elements.statusMessage.classList.remove('hidden');
 
+    // Clear any existing timeout to prevent premature clearing
+    if (this.statusMessageTimer) {
+      clearTimeout(this.statusMessageTimer);
+      this.statusMessageTimer = null;
+    }
+
     if (duration > 0) {
-      setTimeout(() => {
+      this.statusMessageTimer = setTimeout(() => {
         this.elements.statusMessage.textContent = '';
         this.elements.statusMessage.classList.add('hidden');
+        this.statusMessageTimer = null;
       }, duration);
     }
   }
