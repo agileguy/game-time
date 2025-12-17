@@ -36,14 +36,24 @@ class JoinController {
       // Forms
       roomCodeForm: document.getElementById('room-code-form'),
       playerNameForm: document.getElementById('player-name-form'),
+      createRoomForm: document.getElementById('create-room-form'),
 
       // Inputs
       roomCodeInput: document.getElementById('room-code-input'),
       playerNameInput: document.getElementById('player-name-input'),
+      hostNameInput: document.getElementById('host-name-input'),
+      maxPlayersInput: document.getElementById('max-players-input'),
+      publicRoomCheckbox: document.getElementById('public-room-checkbox'),
 
       // Buttons
       createRoomBtn: document.getElementById('create-room-btn'),
       backBtn: document.getElementById('back-btn'),
+
+      // Modal
+      createRoomModal: document.getElementById('create-room-modal'),
+      modalCloseBtn: document.getElementById('modal-close-btn'),
+      modalCancelBtn: document.getElementById('modal-cancel-btn'),
+      createRoomSubmit: document.getElementById('create-room-submit'),
     };
   }
 
@@ -68,9 +78,31 @@ class JoinController {
       this.handlePlayerNameSubmit();
     });
 
-    // Create room button
+    // Create room button - open modal
     this.elements.createRoomBtn.addEventListener('click', () => {
-      this.handleCreateRoom();
+      this.openCreateRoomModal();
+    });
+
+    // Create room form submission
+    this.elements.createRoomForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      this.handleCreateRoomSubmit();
+    });
+
+    // Modal close buttons
+    this.elements.modalCloseBtn.addEventListener('click', () => {
+      this.closeCreateRoomModal();
+    });
+
+    this.elements.modalCancelBtn.addEventListener('click', () => {
+      this.closeCreateRoomModal();
+    });
+
+    // Close modal on overlay click
+    this.elements.createRoomModal.addEventListener('click', (e) => {
+      if (e.target === this.elements.createRoomModal) {
+        this.closeCreateRoomModal();
+      }
     });
 
     // Back button
@@ -172,27 +204,52 @@ class JoinController {
   }
 
   /**
-   * Handle create room
+   * Open create room modal
    */
-  async handleCreateRoom() {
-    // Check if player name is already saved
-    let playerName = storage.getPlayerName();
-
-    if (!playerName) {
-      playerName = prompt('Enter your name:');
-
-      if (!playerName || !validators.isValidPlayerName(playerName)) {
-        notifications.error('Please enter a valid name');
-        return;
-      }
+  openCreateRoomModal() {
+    // Restore saved player name if exists
+    const savedPlayerName = storage.getPlayerName();
+    if (savedPlayerName) {
+      this.elements.hostNameInput.value = savedPlayerName;
     }
 
-    const sanitizedName = validators.sanitizePlayerName(playerName);
+    this.elements.createRoomModal.classList.remove('hidden');
+    this.elements.hostNameInput.focus();
+  }
 
+  /**
+   * Close create room modal
+   */
+  closeCreateRoomModal() {
+    this.elements.createRoomModal.classList.add('hidden');
+    this.elements.createRoomForm.reset();
+    this.elements.maxPlayersInput.value = '12';
+    this.elements.publicRoomCheckbox.checked = true;
+  }
+
+  /**
+   * Handle create room form submission
+   */
+  async handleCreateRoomSubmit() {
+    const hostName = this.elements.hostNameInput.value.trim();
+    const maxPlayers = parseInt(this.elements.maxPlayersInput.value);
+    const isPublic = this.elements.publicRoomCheckbox.checked;
+
+    // Validate host name
+    if (!validators.isValidPlayerName(hostName)) {
+      notifications.error('Please enter a valid name (1-50 characters)');
+      this.elements.hostNameInput.focus();
+      return;
+    }
+
+    const sanitizedName = validators.sanitizePlayerName(hostName);
+
+    // Close modal and show loading
+    this.closeCreateRoomModal();
     this.showLoading();
 
     try {
-      const response = await api.createRoom(sanitizedName);
+      const response = await api.createRoom(sanitizedName, maxPlayers, isPublic);
 
       logger.info('Created room:', response);
 

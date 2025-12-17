@@ -92,14 +92,42 @@ export class ControllerJoinPage {
   async createRoom(hostName: string, maxPlayers: number = 12, isPublic: boolean = true) {
     await this.goto();
 
-    // Handle browser prompt dialog
-    this.page.once('dialog', async dialog => {
-      expect(dialog.type()).toBe('prompt');
-      await dialog.accept(hostName);
+    // Click create room button to open modal
+    await this.createRoomButton.click();
+
+    // Wait for modal to appear
+    await this.page.waitForSelector('#create-room-modal:not(.hidden)', { timeout: 5000 });
+
+    // Fill in the form
+    await this.hostNameInput.fill(hostName);
+    await this.maxPlayersInput.fill(maxPlayers.toString());
+
+    if (!isPublic) {
+      await this.publicRoomCheckbox.uncheck();
+    }
+
+    // Listen for console errors
+    this.page.on('console', msg => {
+      if (msg.type() === 'error') {
+        console.log('Browser console error:', msg.text());
+      }
     });
 
-    await this.createRoomButton.click();
-    await this.page.waitForURL('**/lobby.html', { timeout: 10000 });
+    // Listen for page errors
+    this.page.on('pageerror', error => {
+      console.log('Page error:', error);
+    });
+
+    // Submit the form and wait for navigation
+    const [response] = await Promise.all([
+      this.page.waitForResponse(resp => resp.url().includes('/api/rooms') && resp.request().method() === 'POST'),
+      this.createRoomSubmitButton.click(),
+    ]);
+
+    console.log('Create room response:', await response.json());
+
+    // Now wait for navigation
+    await this.page.waitForURL('**/lobby.html', { timeout: 15000 });
   }
 
   async getNotificationText(): Promise<string | null> {

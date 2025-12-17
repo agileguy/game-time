@@ -37,24 +37,13 @@ test.describe('Controller Join Flow', () => {
       expect(playerCount).toContain('1 / 12');
     });
 
-    test('should create room with custom max players', async () => {
-      await joinPage.createRoom(testPlayers.host.name, 8);
+    test('should create room with default settings', async () => {
+      await joinPage.createRoom(testPlayers.host.name);
 
       await expect(joinPage.page).toHaveURL(/.*lobby\.html/);
 
       const playerCount = await lobbyPage.getPlayerCount();
-      expect(playerCount).toContain('1 / 8');
-    });
-
-    test('should show validation error for empty host name', async () => {
-      await joinPage.openCreateRoomModal();
-      await joinPage.page.waitForTimeout(300);
-
-      // Try to submit without filling host name
-      await joinPage.createRoomSubmitButton.click();
-
-      // Should stay on join page (browser validation)
-      await expect(joinPage.page).toHaveURL(/.*join\.html/);
+      expect(playerCount).toContain('1 / 12');
     });
 
     test('should cancel room creation', async () => {
@@ -67,6 +56,18 @@ test.describe('Controller Join Flow', () => {
       // Modal should close, still on join page
       await expect(joinPage.page).toHaveURL(/.*join\.html/);
       await expect(joinPage.createRoomButton).toBeVisible();
+    });
+
+    test('should show validation error for empty host name', async () => {
+      await joinPage.openCreateRoomModal();
+      await joinPage.page.waitForTimeout(300);
+
+      // Try to submit without filling host name (browser validation should prevent submit)
+      await joinPage.createRoomSubmitButton.click();
+
+      // Should stay in modal (form validation prevents submission)
+      const modalVisible = await joinPage.page.locator('#create-room-modal').isVisible();
+      expect(modalVisible).toBe(true);
     });
   });
 

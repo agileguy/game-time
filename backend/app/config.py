@@ -22,7 +22,7 @@ class Settings(BaseSettings):
         description="Secret key for signing",
     )
     allowed_origins: str = Field(
-        default="http://localhost:3000,http://localhost:8000",
+        default="http://localhost:3000,http://localhost:7070,http://localhost:8000",
         description="Comma-separated list of allowed CORS origins",
     )
 
