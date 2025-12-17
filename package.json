@@ -1,0 +1,14 @@
+{
+  "name": "game-time",
+  "version": "0.1.0",
+  "description": "Multiplayer party game platform E2E tests",
+  "scripts": {
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:debug": "playwright test --debug",
+    "playwright:install": "playwright install --with-deps"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.40.0"
+  }
+}
