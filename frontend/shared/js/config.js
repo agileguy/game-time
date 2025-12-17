@@ -8,11 +8,11 @@ const CONFIG = {
   api: {
     baseUrl: window.location.protocol === 'https:'
       ? `https://${window.location.host}`
-      : `http://${window.location.hostname}:8000`,
+      : `http://${window.location.hostname}:7000`,
 
     wsUrl: window.location.protocol === 'https:'
       ? `wss://${window.location.host}`
-      : `ws://${window.location.hostname}:8000`,
+      : `ws://${window.location.hostname}:7000`,
   },
 
   // WebSocket Configuration
