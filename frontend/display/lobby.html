@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Game Time - Display</title>
+
+  <!-- Shared CSS -->
+  <link rel="stylesheet" href="../shared/css/reset.css">
+  <link rel="stylesheet" href="../shared/css/variables.css">
+  <link rel="stylesheet" href="../shared/css/typography.css">
+  <link rel="stylesheet" href="../shared/css/utilities.css">
+
+  <!-- Display CSS -->
+  <link rel="stylesheet" href="css/lobby.css">
+</head>
+<body class="display-view">
+  <div class="display-container full-screen">
+    <!-- Header -->
+    <header class="display-header">
+      <div class="header-content">
+        <h1 class="game-title">GAME TIME</h1>
+        <div class="connection-status">
+          <span id="connection-indicator" class="connection-dot disconnected"></span>
+          <span id="connection-text" class="text-sm">Connecting...</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="display-main">
+      <!-- Room Code Section -->
+      <section class="room-code-section">
+        <div class="room-code-label">JOIN WITH CODE</div>
+        <div id="room-code" class="room-code-display">----</div>
+        <div class="scan-instruction">
+          Enter this code on your phone at
+          <span id="join-url" class="text-primary">game-time.local</span>
+        </div>
+      </section>
+
+      <!-- Players Section -->
+      <section class="players-section">
+        <div class="section-header">
+          <h2 class="section-title">PLAYERS</h2>
+          <div id="player-count" class="player-count-badge">0 / 12</div>
+        </div>
+
+        <div id="players-grid" class="players-grid">
+          <!-- Player cards will be inserted here -->
+        </div>
+
+        <div id="waiting-message" class="waiting-message">
+          <div class="waiting-icon">👋</div>
+          <div class="waiting-text">Waiting for players to join...</div>
+        </div>
+      </section>
+
+      <!-- Game Status Section -->
+      <section class="game-status-section">
+        <div id="status-message" class="status-message">
+          <!-- Status messages appear here -->
+        </div>
+
+        <div id="start-countdown" class="start-countdown hidden">
+          <div class="countdown-label">STARTING IN</div>
+          <div id="countdown-number" class="countdown-number">3</div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="display-footer">
+      <div class="footer-content">
+        <div class="game-info">
+          <span id="game-mode" class="text-secondary">Lobby</span>
+        </div>
+        <div class="host-info">
+          <span class="text-secondary">Host:</span>
+          <span id="host-name" class="text-primary">---</span>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Scripts -->
+  <script type="module" src="js/lobby.js"></script>
+</body>
+</html>
