@@ -106,28 +106,11 @@ export class ControllerJoinPage {
       await this.publicRoomCheckbox.uncheck();
     }
 
-    // Listen for console errors
-    this.page.on('console', msg => {
-      if (msg.type() === 'error') {
-        console.log('Browser console error:', msg.text());
-      }
-    });
-
-    // Listen for page errors
-    this.page.on('pageerror', error => {
-      console.log('Page error:', error);
-    });
-
     // Submit the form and wait for navigation
-    const [response] = await Promise.all([
-      this.page.waitForResponse(resp => resp.url().includes('/api/rooms') && resp.request().method() === 'POST'),
+    await Promise.all([
+      this.page.waitForURL('**/lobby.html', { timeout: 15000 }),
       this.createRoomSubmitButton.click(),
     ]);
-
-    console.log('Create room response:', await response.json());
-
-    // Now wait for navigation
-    await this.page.waitForURL('**/lobby.html', { timeout: 15000 });
   }
 
   async getNotificationText(): Promise<string | null> {
