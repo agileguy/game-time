@@ -402,8 +402,24 @@ async def handle_message(
 
     # Handle leave room
     if message_type == "leave_room":
+        # Get player info before leaving
+        player = await player_manager.get_player_by_id(player_id)
+        player_name = player.name if player else f"Player {player_id}"
+
         room, new_host = await room_manager.leave_room(player_id)
         await db.commit()
+
+        # Notify others that player left
+        await connection_manager.broadcast_to_room(
+            message={
+                "type": "player_left",
+                "data": {
+                    "player_id": player_id,
+                    "player_name": player_name,
+                },
+            },
+            room_code=room_code,
+        )
 
         # If host was transferred, broadcast event
         if new_host:
