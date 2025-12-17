@@ -2,7 +2,6 @@
 
 import pytest
 
-from app.models import Player, Room
 from app.services import PlayerManager, RoomManager
 
 
@@ -80,7 +79,6 @@ class TestPlayerManagerIntegration:
 
     async def test_update_last_seen(self, db_session, redis_client):
         """Test updating player last seen timestamp."""
-        from datetime import datetime, timedelta
 
         room_manager = RoomManager(db_session)
         player_manager = PlayerManager(db_session, redis_client)
@@ -96,6 +94,7 @@ class TestPlayerManagerIntegration:
 
         # Wait a moment
         import asyncio
+
         await asyncio.sleep(0.1)
 
         # Update last seen
@@ -153,8 +152,10 @@ class TestPlayerManagerIntegration:
         )
         await db_session.commit()
 
-        # Store connection
+        # Store connection and mark player as connected
         await player_manager.store_connection("a" * 64, "conn_789", room.code)
+        await player_manager.update_player_connection(host.id, True)
+        await db_session.commit()
 
         # Check connected
         is_connected = await player_manager.is_player_connected(host.id)
@@ -197,8 +198,14 @@ class TestPlayerManagerIntegration:
         players = await player_manager.get_room_players(room.id)
         assert len(players) == 3
 
+        # Mark players as connected (simulating WebSocket connection)
+        await player_manager.update_player_connection(host.id, True)
+        await player_manager.update_player_connection(player1.id, True)
+        await player_manager.update_player_connection(player2.id, True)
+        await db_session.commit()
+
         # Disconnect one
-        player1.connected = False
+        await player_manager.update_player_connection(player1.id, False)
         await db_session.commit()
 
         # Get only connected

@@ -1,6 +1,5 @@
 """Unit tests for utils module."""
 
-import pytest
 
 import app.utils
 from app.utils import (

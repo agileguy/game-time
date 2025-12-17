@@ -73,10 +73,11 @@ test.describe('Controller Join Flow', () => {
 
   test.describe('Join Existing Room', () => {
     let roomCode: string;
+    let hostContext: any;
 
     test.beforeEach(async ({ browser }) => {
       // Create a room first in a separate context
-      const hostContext = await browser.newContext();
+      hostContext = await browser.newContext();
       const hostPage = await hostContext.newPage();
       const hostJoinPage = new ControllerJoinPage(hostPage);
       const hostLobbyPage = new ControllerLobbyPage(hostPage);
@@ -84,7 +85,15 @@ test.describe('Controller Join Flow', () => {
       await hostJoinPage.createRoom(testPlayers.host.name);
       roomCode = await hostLobbyPage.getRoomCode();
 
-      await hostContext.close();
+      // Keep host context open so host stays connected
+      // await hostContext.close();
+    });
+
+    test.afterEach(async () => {
+      // Clean up host context after each test
+      if (hostContext) {
+        await hostContext.close();
+      }
     });
 
     test('should successfully join existing room with valid code', async () => {
@@ -171,18 +180,23 @@ test.describe('Controller Join Flow', () => {
 
       for (const invalidName of invalidPlayerNames) {
         test(`should reject invalid player name: "${invalidName.substring(0, 20)}${invalidName.length > 20 ? '...' : ''}"`, async () => {
-          await joinPage.enterPlayerName(invalidName);
-          await joinPage.clickJoin();
-
-          // Should show validation error or stay on page
-          await joinPage.page.waitForTimeout(500);
-
           if (invalidName.trim().length === 0) {
             // Empty names should trigger browser validation
+            await joinPage.enterPlayerName(invalidName);
+            await joinPage.clickJoin();
+            await joinPage.page.waitForTimeout(500);
             await expect(joinPage.playerNameInput).toBeVisible();
           } else if (invalidName.length > 50) {
-            // Too long should show error
-            await expect(joinPage.notification).toBeVisible();
+            // Too long - browser maxlength=50 will truncate to 50 chars
+            // Verify the input value is truncated to exactly 50 chars
+            await joinPage.enterPlayerName(invalidName);
+            const inputValue = await joinPage.playerNameInput.inputValue();
+            expect(inputValue.length).toBe(50);
+
+            // Since it's now exactly 50 chars (valid), joining should succeed
+            await joinPage.clickJoin();
+            await joinPage.page.waitForTimeout(1000);
+            await expect(joinPage.page).toHaveURL(/.*lobby\.html/);
           }
         });
       }

@@ -35,7 +35,7 @@ class TestRoomManagerIntegration:
         assert host.id is not None
         assert host.name == "Alice"
         assert host.is_host is True
-        assert host.connected is True
+        assert host.connected is False  # Not connected until WebSocket connects
         assert host.room_id == room.id
 
     async def test_create_room_generates_unique_codes(self, db_session):
@@ -128,7 +128,7 @@ class TestRoomManagerIntegration:
         assert joined_room.id == room.id
         assert player.name == "Bob"
         assert player.is_host is False
-        assert player.connected is True
+        assert player.connected is False  # Not connected until WebSocket connects
         assert player.room_id == room.id
 
         # Verify room has 2 players
@@ -213,14 +213,14 @@ class TestRoomManagerIntegration:
         await db_session.commit()
 
         # Player leaves
-        left_room = await room_manager.leave_room(player.id)
+        left_room, _ = await room_manager.leave_room(player.id)
 
         assert left_room is not None
         assert left_room.id == room.id
 
-        # Verify player marked as disconnected
-        await db_session.refresh(player)
-        assert player.connected is False
+        # Verify player was deleted from database
+        deleted_player = await room_manager.db.get(Player, player.id)
+        assert deleted_player is None
 
     async def test_leave_room_host_transfer(self, db_session):
         """Test host transfer when host leaves."""
@@ -241,7 +241,7 @@ class TestRoomManagerIntegration:
         await db_session.commit()
 
         # Host leaves
-        await room_manager.leave_room(host.id)
+        _, new_host = await room_manager.leave_room(host.id)
         await db_session.commit()
 
         # Verify host transferred
@@ -249,6 +249,7 @@ class TestRoomManagerIntegration:
         await db_session.refresh(player)
         assert room.host_player_id == player.id
         assert player.is_host is True
+        assert new_host.id == player.id
 
     async def test_kick_player(self, db_session):
         """Test host kicking a player."""
@@ -277,9 +278,10 @@ class TestRoomManagerIntegration:
 
         assert result is True
 
-        # Verify player disconnected
-        await db_session.refresh(player)
-        assert player.connected is False
+        # Verify player was deleted from database
+        await db_session.commit()
+        deleted_player = await room_manager.db.get(Player, player.id)
+        assert deleted_player is None
 
     async def test_kick_player_not_host(self, db_session):
         """Test non-host cannot kick players."""
@@ -399,6 +401,12 @@ class TestRoomManagerIntegration:
             player_name="Charlie",
             session_id="c" * 64,
         )
+        await db_session.commit()
+
+        # Mark all as connected (simulating WebSocket connections)
+        host.connected = True
+        player1.connected = True
+        player2.connected = True
         await db_session.commit()
 
         # All connected

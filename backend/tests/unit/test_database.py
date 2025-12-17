@@ -1,6 +1,6 @@
 """Unit tests for database utilities."""
 
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock, patch
 
 import pytest
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -49,7 +49,7 @@ class TestGetDb:
 
             # Use get_db as context manager
             gen = get_db()
-            session = await gen.__anext__()
+            await gen.__anext__()
 
             # Simulate successful completion
             try:
@@ -73,7 +73,7 @@ class TestGetDb:
             mock_session_local.return_value.__aexit__.return_value = None
 
             gen = get_db()
-            session = await gen.__anext__()
+            await gen.__anext__()
 
             # Simulate exception during commit
             with pytest.raises(Exception, match="DB Error"):

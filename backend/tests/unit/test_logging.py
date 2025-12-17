@@ -3,8 +3,6 @@
 import json
 from datetime import datetime
 
-import pytest
-
 from app.core.logging import serialize_log_record
 
 
@@ -13,6 +11,7 @@ class TestLoggingSerializer:
 
     def test_serialize_basic_log_record(self):
         """Test serializing a basic log record."""
+
         # Create a mock log record
         class MockLevel:
             name = "INFO"

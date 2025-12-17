@@ -175,7 +175,7 @@ class TestRoomRoutes:
         assert data["room_code"] == room_code
         assert data["status"] == "lobby"
         assert data["max_players"] == 8
-        assert data["active_players"] == 1
+        assert data["active_players"] == 0  # No WebSocket connections yet
         assert data["is_public"] is True
 
     async def test_get_room_not_found(self, client: AsyncClient):
@@ -205,7 +205,7 @@ class TestRoomRoutes:
         # Check room details
         response = await client.get(f"/api/rooms/{room_code}")
         data = response.json()
-        assert data["active_players"] == 4  # 1 host + 3 joined
+        assert data["active_players"] == 0  # No WebSocket connections yet
 
 
 @pytest.fixture

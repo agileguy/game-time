@@ -80,7 +80,7 @@ async def create_room(
 
     except ValidationError as e:
         raise HTTPException(status_code=400, detail=e.message)
-    except Exception as e:
+    except Exception:
         await db.rollback()
         raise HTTPException(status_code=500, detail="Failed to create room")
 
@@ -138,7 +138,7 @@ async def join_room(
         raise HTTPException(status_code=409, detail=e.message)
     except ValidationError as e:
         raise HTTPException(status_code=400, detail=e.message)
-    except Exception as e:
+    except Exception:
         await db.rollback()
         raise HTTPException(status_code=500, detail="Failed to join room")
 
@@ -184,5 +184,5 @@ async def get_room(
 
     except HTTPException:
         raise
-    except Exception as e:
+    except Exception:
         raise HTTPException(status_code=500, detail="Failed to get room")

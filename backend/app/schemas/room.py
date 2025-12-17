@@ -1,19 +1,14 @@
 """Room-related Pydantic schemas."""
 
-from typing import Optional
 
 from pydantic import BaseModel, Field, field_validator
-
-from app.config import settings
 
 
 class CreateRoomRequest(BaseModel):
     """Request to create a new room."""
 
     host_name: str = Field(..., min_length=1, max_length=50, description="Host player name")
-    max_players: int = Field(
-        default=12, ge=2, le=12, description="Maximum number of players"
-    )
+    max_players: int = Field(default=12, ge=2, le=12, description="Maximum number of players")
     is_public: bool = Field(default=True, description="Whether room is public")
 
     @field_validator("host_name")
@@ -72,7 +67,7 @@ class RoomDetailResponse(BaseModel):
     max_players: int = Field(..., description="Maximum number of players")
     active_players: int = Field(..., description="Number of active players")
     is_public: bool = Field(..., description="Whether room is public")
-    current_game: Optional[str] = Field(None, description="Current game type")
+    current_game: str | None = Field(None, description="Current game type")
 
 
 class PlayerInfo(BaseModel):
@@ -92,6 +87,6 @@ class RoomState(BaseModel):
     room_id: int
     status: str
     max_players: int
-    current_game: Optional[str]
-    host_player_id: Optional[int]
+    current_game: str | None
+    host_player_id: int | None
     players: list[PlayerInfo]

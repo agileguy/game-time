@@ -3,7 +3,7 @@
 import json
 import uuid
 from datetime import datetime
-from typing import Any, Optional
+from typing import Any
 
 from fastapi import WebSocket, WebSocketDisconnect
 from pydantic import BaseModel, ValidationError
@@ -19,8 +19,8 @@ class WebSocketMessage(BaseModel):
 
     type: str
     data: dict[str, Any]
-    timestamp: Optional[int] = None
-    message_id: Optional[str] = None
+    timestamp: int | None = None
+    message_id: str | None = None
 
     def __init__(self, **data):
         """Initialize with timestamp and message_id if not provided."""
@@ -52,9 +52,7 @@ class ConnectionManager:
         """
         return str(uuid.uuid4())
 
-    async def connect(
-        self, websocket: WebSocket, session_id: str, room_code: str
-    ) -> str:
+    async def connect(self, websocket: WebSocket, session_id: str, room_code: str) -> str:
         """
         Accept and register a WebSocket connection.
 
@@ -143,7 +141,10 @@ class ConnectionManager:
         try:
             # Check if WebSocket is still open
             if websocket.client_state.name != "CONNECTED":
-                logger.warning(f"WebSocket not connected, state: {websocket.client_state.name}", extra={"connection_id": connection_id})
+                logger.warning(
+                    f"WebSocket not connected, state: {websocket.client_state.name}",
+                    extra={"connection_id": connection_id},
+                )
                 # Remove from active connections
                 del self.active_connections[connection_id]
                 return
@@ -174,7 +175,7 @@ class ConnectionManager:
         await self.send_personal_message(message, connection_id)
 
     async def broadcast_to_room(
-        self, message: dict[str, Any], room_code: str, exclude: Optional[str] = None
+        self, message: dict[str, Any], room_code: str, exclude: str | None = None
     ):
         """
         Broadcast message to all connections in a room.
@@ -205,7 +206,10 @@ class ConnectionManager:
                 try:
                     # Check if WebSocket is still open
                     if websocket.client_state.name != "CONNECTED":
-                        logger.warning(f"Skipping disconnected WebSocket in broadcast", extra={"connection_id": connection_id})
+                        logger.warning(
+                            "Skipping disconnected WebSocket in broadcast",
+                            extra={"connection_id": connection_id},
+                        )
                         # Remove from active connections
                         del self.active_connections[connection_id]
                         continue

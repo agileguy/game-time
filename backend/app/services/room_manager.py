@@ -1,9 +1,8 @@
 """Room management service."""
 
 from datetime import datetime, timedelta
-from typing import Optional
 
-from sqlalchemy import select, update
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -84,7 +83,7 @@ class RoomManager:
 
         return room, host
 
-    async def get_room_by_code(self, code: str) -> Optional[Room]:
+    async def get_room_by_code(self, code: str) -> Room | None:
         """
         Get room by code.
 
@@ -98,13 +97,11 @@ class RoomManager:
             return None
 
         result = await self.db.execute(
-            select(Room)
-            .where(Room.code == code.upper())
-            .options(selectinload(Room.players))
+            select(Room).where(Room.code == code.upper()).options(selectinload(Room.players))
         )
         return result.scalar_one_or_none()
 
-    async def get_room_by_id(self, room_id: int) -> Optional[Room]:
+    async def get_room_by_id(self, room_id: int) -> Room | None:
         """
         Get room by ID.
 
@@ -161,9 +158,9 @@ class RoomManager:
         if room.status != "lobby":
             raise ValidationError("Cannot join room that is not in lobby")
 
-        # Check if room is full
-        active_players = [p for p in room.players if p.connected]
-        if len(active_players) >= room.max_players:
+        # Check if room is full (count all players, not just connected)
+        # This prevents someone from joining via HTTP and never connecting
+        if len(room.players) >= room.max_players:
             raise RoomFullError(code, room.max_players)
 
         # Create player
@@ -183,7 +180,7 @@ class RoomManager:
 
         return room, player
 
-    async def leave_room(self, player_id: int) -> tuple[Optional[Room], Optional[Player]]:
+    async def leave_room(self, player_id: int) -> tuple[Room | None, Player | None]:
         """
         Player leaves a room.
 
@@ -194,9 +191,7 @@ class RoomManager:
             tuple[Optional[Room], Optional[Player]]: Room the player left and new host if transferred, None if player not found
         """
         result = await self.db.execute(
-            select(Player)
-            .where(Player.id == player_id)
-            .options(selectinload(Player.room))
+            select(Player).where(Player.id == player_id).options(selectinload(Player.room))
         )
         player = result.scalar_one_or_none()
 
@@ -214,9 +209,7 @@ class RoomManager:
 
         # Load room with all players for host transfer
         room_result = await self.db.execute(
-            select(Room)
-            .where(Room.id == room_id)
-            .options(selectinload(Room.players))
+            select(Room).where(Room.id == room_id).options(selectinload(Room.players))
         )
         room = room_result.scalar_one_or_none()
 
@@ -237,8 +230,11 @@ class RoomManager:
         await self.db.delete(player_to_remove)
         await self.db.flush()
 
-        # Refresh room to get updated player list
-        await self.db.refresh(room)
+        # Reload room with players to ensure relationship is eagerly loaded
+        room_result = await self.db.execute(
+            select(Room).where(Room.id == room_id).options(selectinload(Room.players))
+        )
+        room = room_result.scalar_one_or_none()
 
         # If player was host, transfer to another player
         new_host = None
@@ -293,7 +289,7 @@ class RoomManager:
 
         return True
 
-    async def update_room_status(self, room_id: int, status: str) -> Optional[Room]:
+    async def update_room_status(self, room_id: int, status: str) -> Room | None:
         """
         Update room status.
 
@@ -327,9 +323,7 @@ class RoomManager:
         cutoff_time = datetime.utcnow() - timedelta(hours=timeout_hours)
 
         # Get stale rooms
-        result = await self.db.execute(
-            select(Room).where(Room.last_activity < cutoff_time)
-        )
+        result = await self.db.execute(select(Room).where(Room.last_activity < cutoff_time))
         stale_rooms = result.scalars().all()
 
         # Delete stale rooms (cascade will delete players)
@@ -354,7 +348,8 @@ class RoomManager:
         """
         result = await self.db.execute(
             select(Player).where(
-                Player.room_id == room_id, Player.connected == True  # noqa: E712
+                Player.room_id == room_id,
+                Player.connected == True,  # noqa: E712
             )
         )
         return len(result.scalars().all())
@@ -382,9 +377,9 @@ class RoomManager:
 
         raise RuntimeError("Unable to generate unique room code")
 
-    async def _transfer_host(self, room: Room) -> Optional[Player]:
+    async def _transfer_host(self, room: Room) -> Player | None:
         """
-        Transfer host to another connected player.
+        Transfer host to another player, preferring connected players.
 
         Args:
             room: Room to transfer host in
@@ -392,7 +387,7 @@ class RoomManager:
         Returns:
             The new host player if transferred, None otherwise
         """
-        # Find another connected player
+        # First try to find a connected player
         for player in room.players:
             if player.connected and not player.is_host:
                 player.is_host = True
@@ -400,5 +395,13 @@ class RoomManager:
                 await self.db.flush()
                 return player
 
-        # No other players, host remains but disconnected
+        # If no connected players, transfer to any player
+        for player in room.players:
+            if not player.is_host:
+                player.is_host = True
+                room.host_player_id = player.id
+                await self.db.flush()
+                return player
+
+        # No other players in room
         return None

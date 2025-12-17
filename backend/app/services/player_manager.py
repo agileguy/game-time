@@ -1,14 +1,12 @@
 """Player management service."""
 
 from datetime import datetime
-from typing import Optional
 
 import redis.asyncio as aioredis
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import settings
-from app.core.exceptions import PlayerNotFoundError
 from app.core.security import generate_session_id, get_session_expiry
 from app.models import Player
 
@@ -59,7 +57,7 @@ class PlayerManager:
         session_data = await self.redis.get(f"session:{session_id}")
         return session_data is not None
 
-    async def get_player_by_session(self, session_id: str) -> Optional[Player]:
+    async def get_player_by_session(self, session_id: str) -> Player | None:
         """
         Get player by session ID.
 
@@ -69,12 +67,10 @@ class PlayerManager:
         Returns:
             Optional[Player]: Player if found
         """
-        result = await self.db.execute(
-            select(Player).where(Player.session_id == session_id)
-        )
+        result = await self.db.execute(select(Player).where(Player.session_id == session_id))
         return result.scalar_one_or_none()
 
-    async def get_player_by_id(self, player_id: int) -> Optional[Player]:
+    async def get_player_by_id(self, player_id: int) -> Player | None:
         """
         Get player by ID.
 
@@ -87,9 +83,7 @@ class PlayerManager:
         result = await self.db.execute(select(Player).where(Player.id == player_id))
         return result.scalar_one_or_none()
 
-    async def update_player_connection(
-        self, player_id: int, connected: bool
-    ) -> Optional[Player]:
+    async def update_player_connection(self, player_id: int, connected: bool) -> Player | None:
         """
         Update player connection status.
 
@@ -110,7 +104,7 @@ class PlayerManager:
 
         return player
 
-    async def update_last_seen(self, player_id: int) -> Optional[Player]:
+    async def update_last_seen(self, player_id: int) -> Player | None:
         """
         Update player's last seen timestamp.
 
@@ -129,9 +123,7 @@ class PlayerManager:
 
         return player
 
-    async def store_connection(
-        self, session_id: str, connection_id: str, room_code: str
-    ) -> None:
+    async def store_connection(self, session_id: str, connection_id: str, room_code: str) -> None:
         """
         Store WebSocket connection info in Redis.
 
@@ -154,7 +146,7 @@ class PlayerManager:
             room_code,
         )
 
-    async def get_connection_id(self, session_id: str) -> Optional[str]:
+    async def get_connection_id(self, session_id: str) -> str | None:
         """
         Get WebSocket connection ID for a session.
 
@@ -167,7 +159,7 @@ class PlayerManager:
         connection_id = await self.redis.get(f"connection:{session_id}")
         return connection_id
 
-    async def get_player_room(self, session_id: str) -> Optional[str]:
+    async def get_player_room(self, session_id: str) -> str | None:
         """
         Get room code for a player's session.
 

@@ -128,14 +128,16 @@ class TestWebSocketManagerIntegration:
         ws1 = MagicMock()
         ws1.accept = AsyncMock()
         ws1.send_json = AsyncMock()
+        ws1.client_state.name = "CONNECTED"
 
         ws2 = MagicMock()
         ws2.accept = AsyncMock()
         ws2.send_json = AsyncMock()
+        ws2.client_state.name = "CONNECTED"
 
         # Connect two clients to same room
-        conn_id1 = await manager.connect(ws1, "session_1", "ABCD")
-        conn_id2 = await manager.connect(ws2, "session_2", "ABCD")
+        await manager.connect(ws1, "session_1", "ABCD")
+        await manager.connect(ws2, "session_2", "ABCD")
 
         # Broadcast
         await manager.broadcast_to_room(
@@ -156,14 +158,16 @@ class TestWebSocketManagerIntegration:
         ws1 = MagicMock()
         ws1.accept = AsyncMock()
         ws1.send_json = AsyncMock()
+        ws1.client_state.name = "CONNECTED"
 
         ws2 = MagicMock()
         ws2.accept = AsyncMock()
         ws2.send_json = AsyncMock()
+        ws2.client_state.name = "CONNECTED"
 
         # Connect two clients
         conn_id1 = await manager.connect(ws1, "session_1", "ABCD")
-        conn_id2 = await manager.connect(ws2, "session_2", "ABCD")
+        await manager.connect(ws2, "session_2", "ABCD")
 
         # Broadcast excluding conn_id1
         await manager.broadcast_to_room(
@@ -235,19 +239,22 @@ class TestWebSocketManagerIntegration:
         ws1 = MagicMock()
         ws1.accept = AsyncMock()
         ws1.send_json = AsyncMock()
+        ws1.client_state.name = "CONNECTED"
 
         ws2 = MagicMock()
         ws2.accept = AsyncMock()
         ws2.send_json = AsyncMock()
+        ws2.client_state.name = "CONNECTED"
 
         ws3 = MagicMock()
         ws3.accept = AsyncMock()
         ws3.send_json = AsyncMock()
+        ws3.client_state.name = "CONNECTED"
 
         # Connect to different rooms
-        conn1 = await manager.connect(ws1, "s1", "ROOM1")
-        conn2 = await manager.connect(ws2, "s2", "ROOM2")
-        conn3 = await manager.connect(ws3, "s3", "ROOM1")
+        await manager.connect(ws1, "s1", "ROOM1")
+        await manager.connect(ws2, "s2", "ROOM2")
+        await manager.connect(ws3, "s3", "ROOM1")
 
         # Verify room assignments
         assert manager.get_room_connection_count("ROOM1") == 2
@@ -298,4 +305,6 @@ def mock_websocket():
     websocket.send_json = AsyncMock()
     websocket.receive_json = AsyncMock()
     websocket.close = AsyncMock()
+    # Configure client_state for connection checks
+    websocket.client_state.name = "CONNECTED"
     return websocket
