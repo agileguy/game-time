@@ -24,16 +24,40 @@ test.describe('Display Lobby (TV/Projector View)', () => {
     roomCode = await hostPage.getRoomCode();
 
     // Set up display page with the room's session
-    // First, we need to set the session ID and room code in localStorage
+    // Create a display player to get a valid session
+    const displayContext = await browser.newContext();
+    const displayBrowserPage = await displayContext.newPage();
+    const displayJoinPage = new ControllerJoinPage(displayBrowserPage);
+
+    // Join the room as display player
+    await displayJoinPage.joinRoom(roomCode, 'Display');
+
+    // Get the session ID from localStorage
+    const displaySessionId = await displayBrowserPage.evaluate(() => {
+      return localStorage.getItem('gametime_session');
+    });
+
+    await displayContext.close();
+
+    // Now set up the actual display page with the session
     await displayPage.goto();
-    await displayPage.page.evaluate((code) => {
+    await displayPage.page.evaluate(({ sessionId, code }) => {
+      localStorage.setItem('gametime_session', sessionId);
       localStorage.setItem('gametime_room_code', code);
-      // We'll use the host's session for simplicity
-    }, roomCode);
+    }, { sessionId: displaySessionId, code: roomCode });
 
     // Reload to pick up the session
     await displayPage.page.reload();
     await displayPage.page.waitForLoadState('networkidle');
+
+    // Wait for WebSocket to connect and room state to update
+    await displayPage.page.waitForFunction(
+      () => {
+        const roomCodeEl = document.getElementById('room-code');
+        return roomCodeEl && roomCodeEl.textContent !== '----';
+      },
+      { timeout: 10000 }
+    );
   });
 
   test.afterEach(async () => {

@@ -318,6 +318,10 @@
   padding: var(--space-16);
 }
 
+.start-countdown.hidden {
+  display: none;
+}
+
 .countdown-label {
   font-size: var(--font-size-display-md);
   color: var(--color-secondary);

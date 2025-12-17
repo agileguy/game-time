@@ -78,7 +78,8 @@ class RoomDetailResponse(BaseModel):
 class PlayerInfo(BaseModel):
     """Player information."""
 
-    player_id: int = Field(..., description="Player ID")
+    player_id: int = Field(..., description="Player ID", serialization_alias="id")
+    session_id: str = Field(..., description="Player session ID")
     name: str = Field(..., description="Player name")
     is_host: bool = Field(..., description="Whether player is host")
     connected: bool = Field(..., description="Whether player is connected")

@@ -73,7 +73,7 @@ class RoomManager:
             name=host_name,
             session_id=host_session_id,
             is_host=True,
-            connected=True,
+            connected=False,  # Will be set to True when WebSocket connects
         )
         self.db.add(host)
         await self.db.flush()
@@ -172,7 +172,7 @@ class RoomManager:
             name=player_name,
             session_id=session_id,
             is_host=False,
-            connected=True,
+            connected=False,  # Will be set to True when WebSocket connects
         )
         self.db.add(player)
 

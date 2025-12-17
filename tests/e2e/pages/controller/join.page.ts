@@ -83,6 +83,15 @@ export class ControllerJoinPage {
     await this.enterPlayerName(playerName);
     await this.clickJoin();
     await this.page.waitForURL('**/lobby.html');
+
+    // Wait for WebSocket to connect and room state to load
+    await this.page.waitForFunction(
+      () => {
+        const connectionText = document.getElementById('connection-text');
+        return connectionText && connectionText.textContent === 'Connected';
+      },
+      { timeout: 10000 }
+    );
   }
 
   async openCreateRoomModal() {
@@ -111,6 +120,15 @@ export class ControllerJoinPage {
       this.page.waitForURL('**/lobby.html', { timeout: 15000 }),
       this.createRoomSubmitButton.click(),
     ]);
+
+    // Wait for WebSocket to connect and room state to load
+    await this.page.waitForFunction(
+      () => {
+        const connectionText = document.getElementById('connection-text');
+        return connectionText && connectionText.textContent === 'Connected';
+      },
+      { timeout: 10000 }
+    );
   }
 
   async getNotificationText(): Promise<string | null> {

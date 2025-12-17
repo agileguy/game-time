@@ -141,6 +141,13 @@ class ConnectionManager:
         websocket = self.active_connections[connection_id]
 
         try:
+            # Check if WebSocket is still open
+            if websocket.client_state.name != "CONNECTED":
+                logger.warning(f"WebSocket not connected, state: {websocket.client_state.name}", extra={"connection_id": connection_id})
+                # Remove from active connections
+                del self.active_connections[connection_id]
+                return
+
             # Wrap in WebSocketMessage for consistent format
             ws_message = WebSocketMessage(
                 type=message.get("type", "message"), data=message.get("data", message)
@@ -148,6 +155,9 @@ class ConnectionManager:
             await websocket.send_json(ws_message.model_dump())
         except Exception as e:
             logger.error(f"Error sending message: {e}", extra={"connection_id": connection_id})
+            # Remove broken connection
+            if connection_id in self.active_connections:
+                del self.active_connections[connection_id]
 
     async def send_to_session(self, message: dict[str, Any], session_id: str):
         """
@@ -183,19 +193,32 @@ class ConnectionManager:
         )
         message_json = ws_message.model_dump()
 
-        for connection_id in self.room_connections[room_code]:
+        # Create a copy of the list to avoid modification during iteration
+        connection_ids = list(self.room_connections[room_code])
+
+        for connection_id in connection_ids:
             if exclude and connection_id == exclude:
                 continue
 
             if connection_id in self.active_connections:
                 websocket = self.active_connections[connection_id]
                 try:
+                    # Check if WebSocket is still open
+                    if websocket.client_state.name != "CONNECTED":
+                        logger.warning(f"Skipping disconnected WebSocket in broadcast", extra={"connection_id": connection_id})
+                        # Remove from active connections
+                        del self.active_connections[connection_id]
+                        continue
+
                     await websocket.send_json(message_json)
                 except Exception as e:
                     logger.error(
                         f"Error broadcasting to {connection_id}: {e}",
                         extra={"room_code": room_code},
                     )
+                    # Remove broken connection
+                    if connection_id in self.active_connections:
+                        del self.active_connections[connection_id]
 
     async def receive_message(self, websocket: WebSocket) -> WebSocketMessage:
         """
