@@ -1,6 +1,5 @@
 """Application configuration using Pydantic settings."""
 
-
 from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -43,7 +42,7 @@ class Settings(BaseSettings):
     redis_max_connections: int = Field(default=50, description="Max Redis connections")
 
     # Server
-    host: str = Field(default="0.0.0.0", description="Server host")
+    host: str = Field(default="0.0.0.0", description="Server host")  # nosec B104
     port: int = Field(default=8000, description="Server port")
     reload: bool = Field(default=False, description="Auto-reload on code changes")
 

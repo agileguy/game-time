@@ -1,6 +1,5 @@
 """Redis client configuration and connection management."""
 
-
 import redis.asyncio as aioredis
 
 from app.config import settings
