@@ -1,0 +1,141 @@
+/**
+ * CSS Custom Properties (Design Tokens)
+ * Global design system variables
+ */
+
+:root {
+  /* Colors - Primary (Orange - 8-bit inspired) */
+  --color-primary: #ff6b00;
+  --color-primary-light: #ff8533;
+  --color-primary-dark: #cc5500;
+
+  /* Colors - Secondary (Bright orange accents) */
+  --color-secondary: #ffaa00;
+  --color-secondary-light: #ffcc00;
+  --color-secondary-dark: #ff8800;
+
+  /* Colors - Accent (Yellow for highlights) */
+  --color-accent: #ffdd00;
+  --color-accent-light: #ffee55;
+  --color-accent-dark: #ccaa00;
+
+  /* Colors - Neutral (Black-based 8-bit palette) */
+  --color-gray-50: #2a2a2a;
+  --color-gray-100: #333333;
+  --color-gray-200: #444444;
+  --color-gray-300: #555555;
+  --color-gray-400: #777777;
+  --color-gray-500: #999999;
+  --color-gray-600: #bbbbbb;
+  --color-gray-700: #dddddd;
+  --color-gray-800: #eeeeee;
+  --color-gray-900: #ffffff;
+
+  /* Colors - Semantic (8-bit game colors) */
+  --color-success: #00ff00;    /* Classic bright green */
+  --color-warning: #ffaa00;    /* Orange warning */
+  --color-error: #ff0000;      /* Bright red */
+  --color-info: #00aaff;       /* Cyan blue */
+
+  /* Colors - Background (Black dominant) */
+  --color-bg-primary: #000000;
+  --color-bg-secondary: #111111;
+  --color-bg-dark: #0a0a0a;
+  --color-bg-darker: #000000;
+
+  /* Colors - Text (Orange and white on black) */
+  --color-text-primary: #ff6b00;
+  --color-text-secondary: #ffaa00;
+  --color-text-inverse: #000000;
+
+  /* Typography (8-bit / Retro inspired) */
+  --font-family-base: 'Press Start 2P', 'Courier New', monospace;
+  --font-family-display: 'Press Start 2P', 'Courier New', monospace;
+  --font-family-mono: 'Courier New', 'Consolas', monospace;
+
+  /* Font Sizes - Display (TV screens) */
+  --font-size-display-xs: 1.5rem;    /* 24px */
+  --font-size-display-sm: 2rem;      /* 32px */
+  --font-size-display-md: 3rem;      /* 48px */
+  --font-size-display-lg: 4rem;      /* 64px */
+  --font-size-display-xl: 6rem;      /* 96px */
+  --font-size-display-2xl: 8rem;     /* 128px */
+
+  /* Font Sizes - Controller (mobile) */
+  --font-size-xs: 0.75rem;    /* 12px */
+  --font-size-sm: 0.875rem;   /* 14px */
+  --font-size-base: 1rem;     /* 16px */
+  --font-size-lg: 1.125rem;   /* 18px */
+  --font-size-xl: 1.25rem;    /* 20px */
+  --font-size-2xl: 1.5rem;    /* 24px */
+  --font-size-3xl: 1.875rem;  /* 30px */
+  --font-size-4xl: 2.25rem;   /* 36px */
+
+  /* Font Weights */
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --font-weight-extrabold: 800;
+
+  /* Line Heights */
+  --line-height-tight: 1.25;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.75;
+
+  /* Spacing */
+  --space-1: 0.25rem;   /* 4px */
+  --space-2: 0.5rem;    /* 8px */
+  --space-3: 0.75rem;   /* 12px */
+  --space-4: 1rem;      /* 16px */
+  --space-5: 1.25rem;   /* 20px */
+  --space-6: 1.5rem;    /* 24px */
+  --space-8: 2rem;      /* 32px */
+  --space-10: 2.5rem;   /* 40px */
+  --space-12: 3rem;     /* 48px */
+  --space-16: 4rem;     /* 64px */
+  --space-20: 5rem;     /* 80px */
+  --space-24: 6rem;     /* 96px */
+
+  /* Border Radius (Sharp 8-bit edges) */
+  --radius-sm: 0;         /* No rounding */
+  --radius-md: 0;         /* No rounding */
+  --radius-lg: 0;         /* No rounding */
+  --radius-xl: 0;         /* No rounding */
+  --radius-2xl: 0;        /* No rounding */
+  --radius-full: 0;       /* No rounding */
+
+  /* Shadows (8-bit box shadows with orange glow) */
+  --shadow-sm: 2px 2px 0 rgba(255, 107, 0, 0.3);
+  --shadow-md: 4px 4px 0 rgba(255, 107, 0, 0.5);
+  --shadow-lg: 6px 6px 0 rgba(255, 107, 0, 0.6);
+  --shadow-xl: 8px 8px 0 rgba(255, 107, 0, 0.7);
+
+  /* 8-bit Borders */
+  --border-width: 3px;
+  --border-style: solid;
+  --border-color: var(--color-primary);
+
+  /* Transitions */
+  --transition-fast: 150ms ease-in-out;
+  --transition-base: 200ms ease-in-out;
+  --transition-slow: 300ms ease-in-out;
+
+  /* Z-index layers */
+  --z-base: 0;
+  --z-dropdown: 100;
+  --z-sticky: 200;
+  --z-fixed: 300;
+  --z-modal-backdrop: 400;
+  --z-modal: 500;
+  --z-popover: 600;
+  --z-tooltip: 700;
+  --z-notification: 800;
+
+  /* Breakpoints (for reference in JS) */
+  --breakpoint-sm: 640px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;
+  --breakpoint-xl: 1280px;
+  --breakpoint-2xl: 1536px;
+}
