@@ -277,6 +277,264 @@ Read(/home/dan/game-time/**)
 Read(/home/dan/game-time/.*)
 ```
 
+## Phase Implementation Workflow
+
+When implementing any phase from PLAN.md, follow this workflow:
+
+### 1. Branch Creation
+```bash
+# Create feature branch from main for the phase
+git checkout main
+git pull origin main
+git checkout -b phase/N-phase-name
+```
+
+**Branch Naming Convention:**
+- `phase/1-core-infrastructure`
+- `phase/2-lobby-system`
+- `phase/3-game-base-system`
+- `phase/4-horse-race-game`
+- `phase/5-trivia-game`
+- `phase/6-memory-game`
+- `phase/7-polish-testing`
+
+### 2. Implementation Steps
+
+**For each step within the phase:**
+
+a. **Create the implementation**
+   - Write code following the plan
+   - Use TodoWrite to track progress
+   - Follow security best practices from SECURITY.md
+
+b. **Write tests FIRST or ALONGSIDE**
+   - Unit tests for new functions/classes
+   - Integration tests for API endpoints
+   - E2E tests for user flows (where applicable)
+   - Aim for 80%+ coverage
+
+c. **Run tests and verify**
+   ```bash
+   # Unit tests
+   pytest tests/unit -v
+
+   # Integration tests (if applicable)
+   pytest tests/integration -v
+
+   # Code quality
+   ruff format .
+   ruff check .
+   mypy app
+   ```
+
+d. **Update documentation**
+   - Update relevant .md files if APIs change
+   - Add docstrings to new functions
+   - Update PLAN.md progress checkboxes
+   - Keep README.md current
+
+e. **Commit the step**
+   ```bash
+   git add .
+   git commit -m "Phase N: Implement [specific feature]
+
+   - Add [component/feature]
+   - Add tests for [component/feature]
+   - Update [documentation]
+
+   Tests: X passing
+   Coverage: X%"
+   ```
+
+**Commit Message Format:**
+```
+Phase N: [Short description]
+
+[Detailed description of what was implemented]
+
+- Bullet point of changes
+- Another change
+- Tests added/updated
+
+Tests: [test results]
+Coverage: [coverage %]
+```
+
+### 3. Continuous Integration
+
+After each commit:
+```bash
+# Ensure tests pass
+pytest
+
+# Check code quality
+ruff check .
+mypy app
+
+# Verify no regressions
+pytest tests/ --cov=app
+```
+
+### 4. Documentation Maintenance
+
+Keep these files updated throughout the phase:
+- **PLAN.md**: Mark completed items with `[x]`
+- **README.md**: Update if new features added
+- **SECURITY.md**: Update if security features added
+- **TESTING.md**: Add new test examples
+- **API docs**: Update OpenAPI/Swagger specs
+
+### 5. Pull Request Creation
+
+When phase is complete:
+
+a. **Final verification**
+   ```bash
+   # Run full test suite
+   pytest tests/ -v --cov=app --cov-report=term
+
+   # Check coverage threshold
+   pytest --cov=app --cov-fail-under=80
+
+   # Security scan
+   bandit -r app
+   safety check
+
+   # Code quality
+   ruff check .
+   mypy app --strict
+   ```
+
+b. **Push branch**
+   ```bash
+   git push -u origin phase/N-phase-name
+   ```
+
+c. **Create PR with GitHub CLI**
+   ```bash
+   gh pr create \
+     --title "Phase N: [Phase Name]" \
+     --body "$(cat <<'EOF'
+   ## Summary
+   Implements Phase N: [Phase Name] from PLAN.md
+
+   ### What's Included
+   - Feature 1
+   - Feature 2
+   - Feature 3
+
+   ### Tests Added
+   - Unit tests: X files, Y tests
+   - Integration tests: X files, Y tests
+   - E2E tests: X scenarios
+
+   ### Coverage
+   - Overall: X%
+   - New code: Y%
+
+   ### Documentation Updated
+   - [x] PLAN.md progress tracked
+   - [x] README.md updated
+   - [x] API documentation current
+   - [x] Tests documented in TESTING.md
+
+   ### Checklist
+   - [x] All tests passing
+   - [x] Coverage >= 80%
+   - [x] Code formatted (ruff)
+   - [x] Type checks passing (mypy)
+   - [x] Security scan clean (bandit)
+   - [x] No dependency vulnerabilities (safety)
+   - [x] Documentation updated
+
+   ### How to Test
+   \`\`\`bash
+   # Setup
+   git checkout phase/N-phase-name
+   docker-compose up -d
+
+   # Run tests
+   pytest tests/unit
+   pytest tests/integration
+   \`\`\`
+
+   ### Screenshots (if applicable)
+   [Add screenshots of new UI features]
+
+   ---
+   🤖 Generated with Claude Code
+   EOF
+   )"
+   ```
+
+d. **PR Review Checklist**
+   - All CI checks passing
+   - Code review completed
+   - Tests demonstrate functionality
+   - Documentation is clear
+   - No merge conflicts
+   - Security considerations addressed
+
+### 6. Merge Strategy
+
+**After PR approval:**
+```bash
+# Squash and merge (keep history clean)
+gh pr merge --squash --delete-branch
+
+# Or rebase and merge (preserve commits)
+gh pr merge --rebase --delete-branch
+```
+
+### 7. Post-Merge
+
+```bash
+# Update local main
+git checkout main
+git pull origin main
+
+# Delete local branch
+git branch -d phase/N-phase-name
+
+# Update PLAN.md on main if needed
+# Ready for next phase
+```
+
+## Implementation Principles
+
+### Test-Driven Development (TDD)
+1. Write failing test
+2. Implement minimal code to pass
+3. Refactor while keeping tests green
+4. Commit
+
+### Incremental Commits
+- Each commit should be logical and atomic
+- Commit message should explain WHY, not just what
+- Include test results in commit message
+- Each commit should leave the codebase in a working state
+
+### Documentation-as-Code
+- Document while coding, not after
+- Code comments explain complex logic
+- README updates with feature additions
+- API docs auto-generated from code
+
+### Security-First
+- Validate all inputs
+- Sanitize all outputs
+- Test security features
+- Follow SECURITY.md guidelines
+
+### Quality Gates
+Every commit must:
+- ✅ Pass all existing tests
+- ✅ Add tests for new code
+- ✅ Maintain or improve coverage
+- ✅ Pass linting (ruff)
+- ✅ Pass type checking (mypy)
+- ✅ Be properly formatted
+
 ## Notes
 
 - All Git operations are allowed for seamless version control
