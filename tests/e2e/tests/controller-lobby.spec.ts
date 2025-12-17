@@ -293,12 +293,6 @@ test.describe('Controller Lobby', () => {
   });
 
   test.describe('Error Handling', () => {
-    test('should show error when non-host tries to start game', async () => {
-      // This would require direct API call or WebSocket manipulation
-      // since the UI doesn't show start button for non-hosts
-      // Skipping this test as it's prevented by UI
-    });
-
     test('should show error notification on WebSocket error', async () => {
       // This would require simulating a WebSocket error
       // which is complex in e2e tests
