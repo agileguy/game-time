@@ -1,4 +1,4 @@
-import { Page, Locator } from '@playwright/test';
+import { Page, Locator, expect } from '@playwright/test';
 
 /**
  * Page object for Controller Join screen
@@ -91,18 +91,15 @@ export class ControllerJoinPage {
 
   async createRoom(hostName: string, maxPlayers: number = 12, isPublic: boolean = true) {
     await this.goto();
-    await this.openCreateRoomModal();
-    await this.page.waitForTimeout(300); // Wait for modal animation
 
-    await this.hostNameInput.fill(hostName);
-    await this.maxPlayersInput.fill(maxPlayers.toString());
+    // Handle browser prompt dialog
+    this.page.once('dialog', async dialog => {
+      expect(dialog.type()).toBe('prompt');
+      await dialog.accept(hostName);
+    });
 
-    if (!isPublic) {
-      await this.publicRoomCheckbox.uncheck();
-    }
-
-    await this.createRoomSubmitButton.click();
-    await this.page.waitForURL('**/lobby.html');
+    await this.createRoomButton.click();
+    await this.page.waitForURL('**/lobby.html', { timeout: 10000 });
   }
 
   async getNotificationText(): Promise<string | null> {

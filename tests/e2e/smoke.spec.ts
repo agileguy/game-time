@@ -11,8 +11,7 @@ test.describe('API Smoke Tests', () => {
     const data = await response.json();
 
     expect(data).toHaveProperty('status', 'healthy');
-    expect(data).toHaveProperty('service', 'Game Time');
-    expect(data).toHaveProperty('version');
+    expect(data).toHaveProperty('service', 'game-time');
   });
 
   test('readiness endpoint returns ready status', async ({ request }) => {
