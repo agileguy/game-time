@@ -22,18 +22,45 @@ test.describe('Multi-Client Integration', () => {
       await hostJoinPage.createRoom(testPlayers.host.name);
       roomCode = await hostPage.getRoomCode();
 
+      // Create a display player to get a valid session
+      const displaySetupContext = await browser.newContext();
+      const displaySetupPage = await displaySetupContext.newPage();
+      const displayJoinPage = new ControllerJoinPage(displaySetupPage);
+
+      // Join the room as display player
+      await displayJoinPage.joinRoom(roomCode, 'Display');
+
+      // Get the session ID from localStorage
+      const displaySessionId = await displaySetupPage.evaluate(() => {
+        return localStorage.getItem('gametime_session');
+      });
+
+      await displaySetupContext.close();
+
       // Create display
       displayContext = await browser.newContext();
       const displayBrowserPage = await displayContext.newPage();
       displayPage = new DisplayLobbyPage(displayBrowserPage);
 
-      // Set up display with room code
+      // Set up display with the session and room code
       await displayPage.goto();
-      await displayPage.page.evaluate((code) => {
+      await displayPage.page.evaluate(({ sessionId, code }) => {
+        localStorage.setItem('gametime_session', sessionId);
         localStorage.setItem('gametime_room_code', code);
-      }, roomCode);
+      }, { sessionId: displaySessionId, code: roomCode });
+
+      // Reload to pick up the session
       await displayPage.page.reload();
-      await displayPage.page.waitForTimeout(1000);
+      await displayPage.page.waitForLoadState('networkidle');
+
+      // Wait for WebSocket to connect and room state to update
+      await displayPage.page.waitForFunction(
+        () => {
+          const roomCodeEl = document.getElementById('room-code');
+          return roomCodeEl && roomCodeEl.textContent !== '----';
+        },
+        { timeout: 10000 }
+      );
     });
 
     test.afterEach(async () => {
@@ -154,16 +181,40 @@ test.describe('Multi-Client Integration', () => {
       roomCode = await hostLobbyPage.getRoomCode();
       contexts.push(hostContext);
 
+      // Create a display player to get a valid session
+      const displaySetupContext = await browser.newContext();
+      const displaySetupPage = await displaySetupContext.newPage();
+      const displayJoinPage = new ControllerJoinPage(displaySetupPage);
+
+      await displayJoinPage.joinRoom(roomCode, 'Display');
+
+      const displaySessionId = await displaySetupPage.evaluate(() => {
+        return localStorage.getItem('gametime_session');
+      });
+
+      await displaySetupContext.close();
+
       // Create display
       const displayContext = await browser.newContext();
       const displayBrowserPage = await displayContext.newPage();
       const displayPage = new DisplayLobbyPage(displayBrowserPage);
 
       await displayPage.goto();
-      await displayPage.page.evaluate((code) => {
+      await displayPage.page.evaluate(({ sessionId, code }) => {
+        localStorage.setItem('gametime_session', sessionId);
         localStorage.setItem('gametime_room_code', code);
-      }, roomCode);
+      }, { sessionId: displaySessionId, code: roomCode });
       await displayPage.page.reload();
+      await displayPage.page.waitForLoadState('networkidle');
+
+      // Wait for display to connect
+      await displayPage.page.waitForFunction(
+        () => {
+          const roomCodeEl = document.getElementById('room-code');
+          return roomCodeEl && roomCodeEl.textContent !== '----';
+        },
+        { timeout: 10000 }
+      );
       contexts.push(displayContext);
 
       // Add 5 players
@@ -186,22 +237,22 @@ test.describe('Multi-Client Integration', () => {
       // Wait for all updates
       await displayPage.page.waitForTimeout(2000);
 
-      // Verify all players see 6 total players (host + 5)
+      // Verify all players see 7 total players (host + Display + 5)
       const hostPlayerCount = await hostLobbyPage.getPlayerCount();
-      expect(hostPlayerCount).toBe('6 / 12');
+      expect(hostPlayerCount).toBe('7 / 12');
 
       for (const playerPage of playerPages) {
         const count = await playerPage.getPlayerCount();
-        expect(count).toBe('6 / 12');
+        expect(count).toBe('7 / 12');
       }
 
-      // Display should also show 6 players
+      // Display should also show 7 players
       const displayCount = await displayPage.getPlayerCount();
-      expect(displayCount).toBe('6 / 12');
+      expect(displayCount).toBe('7 / 12');
 
       // Verify all player names are visible
       const displayPlayers = await displayPage.getPlayerNames();
-      expect(displayPlayers.length).toBe(6);
+      expect(displayPlayers.length).toBe(7);
     });
 
     test('should sync player leave across all clients', async ({ browser }) => {
@@ -308,16 +359,40 @@ test.describe('Multi-Client Integration', () => {
       roomCode = await hostLobbyPage.getRoomCode();
       contexts.push(hostContext);
 
+      // Create a display player to get a valid session
+      const displaySetupContext = await browser.newContext();
+      const displaySetupPage = await displaySetupContext.newPage();
+      const displayJoinPage = new ControllerJoinPage(displaySetupPage);
+
+      await displayJoinPage.joinRoom(roomCode, 'Display');
+
+      const displaySessionId = await displaySetupPage.evaluate(() => {
+        return localStorage.getItem('gametime_session');
+      });
+
+      await displaySetupContext.close();
+
       // Create display
       const displayContext = await browser.newContext();
       const displayBrowserPage = await displayContext.newPage();
       const displayPage = new DisplayLobbyPage(displayBrowserPage);
 
       await displayPage.goto();
-      await displayPage.page.evaluate((code) => {
+      await displayPage.page.evaluate(({ sessionId, code }) => {
+        localStorage.setItem('gametime_session', sessionId);
         localStorage.setItem('gametime_room_code', code);
-      }, roomCode);
+      }, { sessionId: displaySessionId, code: roomCode });
       await displayPage.page.reload();
+      await displayPage.page.waitForLoadState('networkidle');
+
+      // Wait for display to connect
+      await displayPage.page.waitForFunction(
+        () => {
+          const roomCodeEl = document.getElementById('room-code');
+          return roomCodeEl && roomCodeEl.textContent !== '----';
+        },
+        { timeout: 10000 }
+      );
       contexts.push(displayContext);
 
       // Add player

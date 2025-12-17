@@ -22,22 +22,14 @@ class DisplayLobbyController {
    * Initialize controller
    */
   async init() {
-    // Check room code
+    // Check session
+    this.sessionId = storage.getSessionId();
     this.roomCode = storage.getRoomCode();
 
-    if (!this.roomCode) {
-      logger.warn('No room code found');
+    if (!this.sessionId || !this.roomCode) {
+      logger.warn('No session or room code found');
       this.showStatusMessage('Please create or join a room from your mobile device');
       return;
-    }
-
-    // Get or create session ID for display
-    this.sessionId = storage.getSessionId();
-    if (!this.sessionId) {
-      // Generate a session ID for the display
-      this.sessionId = crypto.randomUUID();
-      storage.setSessionId(this.sessionId);
-      logger.info('Generated new session ID for display:', this.sessionId);
     }
 
     this.cacheElements();
