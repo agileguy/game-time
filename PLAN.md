@@ -718,6 +718,7 @@ MEMORY_CONFIG = {
 - Connection tracking
 - Host assignment and transfer
 - Kick player functionality
+- Database test fixtures for model testing (re-enable test_models.py)
 
 #### 2.3 WebSocket Infrastructure
 - WebSocket endpoint with authentication
@@ -755,6 +756,8 @@ MEMORY_CONFIG = {
 - Host can control lobby
 - WebSocket reconnection works
 - Full test coverage of room flows
+- **Re-enable model tests in CI** (currently skipped in Phase 1)
+- **Increase code coverage to 80%+** (currently 53% in Phase 1)
 
 ### Phase 3: Game Framework (Week 2)
 
