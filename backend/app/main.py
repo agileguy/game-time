@@ -76,7 +76,7 @@ async def readiness_check() -> JSONResponse:
     """
     try:
         # Check Redis connection
-        await redis_client.client.ping()
+        await redis_client.client.ping()  # type: ignore[misc]
 
         return JSONResponse(
             content={

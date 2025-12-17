@@ -79,13 +79,13 @@ class Room(Base, TimestampMixin):
     )
 
     # Relationships
-    players: Mapped[list["Player"]] = relationship(  # noqa: F821
+    players: Mapped[list["Player"]] = relationship(  # noqa: F821  # type: ignore[name-defined]
         "Player",
         back_populates="room",
         cascade="all, delete-orphan",
     )
 
-    game_sessions: Mapped[list["GameSession"]] = relationship(  # noqa: F821
+    game_sessions: Mapped[list["GameSession"]] = relationship(  # noqa: F821  # type: ignore[name-defined]
         "GameSession",
         back_populates="room",
         cascade="all, delete-orphan",

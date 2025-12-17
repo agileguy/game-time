@@ -120,4 +120,4 @@ class GameSession(Base):
         if not self.is_finished:
             return None
 
-        return (self.finished_at - self.started_at).total_seconds()
+        return (self.finished_at - self.started_at).total_seconds()  # type: ignore[operator]

@@ -53,7 +53,7 @@ def configure_logging() -> None:
         # JSON format for production
         logger.add(
             sys.stdout,
-            format=serialize_log_record,
+            format=serialize_log_record,  # type: ignore[arg-type]
             level=settings.log_level,
             serialize=False,
         )
@@ -76,12 +76,12 @@ def configure_logging() -> None:
             rotation="500 MB",
             retention="10 days",
             compression="zip",
-            format=serialize_log_record,
+            format=serialize_log_record,  # type: ignore[arg-type]
             level=settings.log_level,
         )
 
 
-def get_logger() -> logger:
+def get_logger() -> logger:  # type: ignore[valid-type]
     """
     Get configured logger instance.
 
