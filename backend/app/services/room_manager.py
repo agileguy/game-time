@@ -183,7 +183,7 @@ class RoomManager:
 
         return room, player
 
-    async def leave_room(self, player_id: int) -> Optional[Room]:
+    async def leave_room(self, player_id: int) -> tuple[Optional[Room], Optional[Player]]:
         """
         Player leaves a room.
 
@@ -191,7 +191,7 @@ class RoomManager:
             player_id: Player ID
 
         Returns:
-            Optional[Room]: Room the player left, None if player not found
+            tuple[Optional[Room], Optional[Player]]: Room the player left and new host if transferred, None if player not found
         """
         result = await self.db.execute(
             select(Player)
@@ -201,10 +201,10 @@ class RoomManager:
         player = result.scalar_one_or_none()
 
         if not player:
-            return None
+            return None, None
 
         if not player.room:
-            return None
+            return None, None
 
         # Store room_id before expiring
         room_id = player.room.id
@@ -231,15 +231,16 @@ class RoomManager:
         await self.db.flush()
 
         # If player was host, transfer to another player
+        new_host = None
         if player.is_host and room:
-            await self._transfer_host(room)
+            new_host = await self._transfer_host(room)
 
         # Update room activity
         if room:
             room.last_activity = datetime.utcnow()
             await self.db.flush()
 
-        return room
+        return room, new_host
 
     async def kick_player(self, room_id: int, player_id: int, kicker_id: int) -> bool:
         """
@@ -371,12 +372,15 @@ class RoomManager:
 
         raise RuntimeError("Unable to generate unique room code")
 
-    async def _transfer_host(self, room: Room) -> None:
+    async def _transfer_host(self, room: Room) -> Optional[Player]:
         """
         Transfer host to another connected player.
 
         Args:
             room: Room to transfer host in
+
+        Returns:
+            The new host player if transferred, None otherwise
         """
         # Find another connected player
         for player in room.players:
@@ -384,6 +388,7 @@ class RoomManager:
                 player.is_host = True
                 room.host_player_id = player.id
                 await self.db.flush()
-                return
+                return player
 
         # No other players, host remains but disconnected
+        return None

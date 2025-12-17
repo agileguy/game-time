@@ -199,9 +199,9 @@ class LobbyController {
       }
     });
 
-    // Game started
-    this.ws.on('game_started', (data) => {
-      logger.info('Game started:', data);
+    // Game starting (with countdown)
+    this.ws.on('game_starting', (data) => {
+      logger.info('Game starting:', data);
       this.handleGameStarted();
     });
 
@@ -403,7 +403,7 @@ class LobbyController {
    * Handle game started
    */
   handleGameStarted() {
-    notifications.success('Game starting!');
+    notifications.success('Starting game...');
 
     // Redirect to game view
     setTimeout(() => {

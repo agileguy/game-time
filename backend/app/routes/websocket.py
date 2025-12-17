@@ -190,6 +190,9 @@ async def websocket_endpoint(
                 player = await player_manager.get_player_by_id(player_id)
                 player_name = player.name if player else f"Player {player_id}"
 
+                # Check if player was host before updating connection
+                was_host = player.is_host if player else False
+
                 await player_manager.update_player_connection(player_id, connected=False)
                 await db.commit()
 
@@ -204,6 +207,29 @@ async def websocket_endpoint(
                     },
                     room_code=room_code,
                 )
+
+                # If player was host, transfer to another player
+                if was_host:
+                    room = await room_manager.get_room_by_code(room_code)
+                    if room:
+                        # Import Optional and Player for type hints
+                        from app.models.player import Player as PlayerModel
+                        new_host: Optional[PlayerModel] = await room_manager._transfer_host(room)
+                        await db.commit()
+
+                        if new_host:
+                            logger.info(f"Host transferred to player {new_host.id} ({new_host.name})")
+                            # Broadcast host transfer event
+                            await connection_manager.broadcast_to_room(
+                                message={
+                                    "type": "host_transferred",
+                                    "data": {
+                                        "new_host_id": new_host.id,
+                                        "new_host_name": new_host.name,
+                                    },
+                                },
+                                room_code=room_code,
+                            )
 
                 # Broadcast updated room state to all remaining players
                 try:
@@ -376,7 +402,27 @@ async def handle_message(
 
     # Handle leave room
     if message_type == "leave_room":
-        await room_manager.leave_room(player_id)
+        room, new_host = await room_manager.leave_room(player_id)
+        await db.commit()
+
+        # If host was transferred, broadcast event
+        if new_host:
+            logger.info(f"Host transferred to player {new_host.id} ({new_host.name}) after leave")
+            await connection_manager.broadcast_to_room(
+                message={
+                    "type": "host_transferred",
+                    "data": {
+                        "new_host_id": new_host.id,
+                        "new_host_name": new_host.name,
+                    },
+                },
+                room_code=room_code,
+            )
+
+        # Broadcast updated room state
+        if room:
+            await send_room_state_to_all(room, room_code, room_manager, player_manager)
+
         return
 
     # Handle kick player (host only)
@@ -411,29 +457,29 @@ async def handle_message(
     # Handle start game (host only)
     elif message_type == "start_game":
         game_type = message.data.get("game_type")
-        if game_type:
-            # Get player
-            player = await player_manager.get_player_by_id(player_id)
-            if player and player.is_host:
-                # Update room status
-                room = await room_manager.get_room_by_id(player.room_id)
-                if room and room.status == "lobby":
-                    room.status = "playing"
-                    room.current_game = game_type
-                    await db.flush()
+        # Get player
+        player = await player_manager.get_player_by_id(player_id)
+        if player and player.is_host:
+            # Update room status
+            room = await room_manager.get_room_by_id(player.room_id)
+            if room and room.status == "lobby":
+                room.status = "playing"
+                room.current_game = game_type
+                await db.flush()
 
-                    # Notify room
-                    await connection_manager.broadcast_to_room(
-                        message={
-                            "type": "game_starting",
-                            "data": {"game_type": game_type},
-                        },
-                        room_code=room_code,
-                    )
-            else:
-                await connection_manager.send_error(
-                    "Only host can start game", connection_id, "FORBIDDEN"
+                # Notify room - send game_starting with countdown
+                await connection_manager.broadcast_to_room(
+                    message={
+                        "type": "game_starting",
+                        "data": {"game_type": game_type, "countdown": 3},
+                    },
+                    room_code=room_code,
                 )
+                logger.info(f"Game starting in room {room_code} with type {game_type}")
+        else:
+            await connection_manager.send_error(
+                "Only host can start game", connection_id, "FORBIDDEN"
+            )
 
     # Unknown message type
     else:
