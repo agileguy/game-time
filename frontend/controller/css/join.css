@@ -1,0 +1,122 @@
+/**
+ * Controller Join Screen Styles
+ * 8-bit retro theme for mobile devices
+ */
+
+.join-container {
+  width: 100%;
+  max-width: 500px;
+  padding: var(--space-6);
+}
+
+.join-header {
+  text-align: center;
+  margin-bottom: var(--space-8);
+}
+
+.join-header h1 {
+  font-size: var(--font-size-3xl);
+  margin-bottom: var(--space-2);
+  text-shadow: 3px 3px 0 rgba(255, 107, 0, 0.3);
+}
+
+.join-form-container {
+  background: var(--color-bg-secondary);
+  border: var(--border-width) solid var(--color-primary);
+  box-shadow: var(--shadow-xl);
+  padding: var(--space-8);
+}
+
+.join-step {
+  animation: fadeIn var(--transition-base);
+}
+
+.form-group {
+  margin-bottom: var(--space-4);
+}
+
+.form-label {
+  display: block;
+  margin-bottom: var(--space-2);
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+#room-code-input {
+  letter-spacing: 0.5em;
+  text-transform: uppercase;
+  font-size: var(--font-size-4xl);
+  padding: var(--space-6);
+}
+
+#room-code-input::placeholder {
+  letter-spacing: 0.3em;
+}
+
+.divider {
+  height: var(--border-width);
+  background: var(--color-gray-400);
+  margin: var(--space-6) 0;
+}
+
+.w-full {
+  width: 100%;
+}
+
+/* Loading spinner center */
+.join-step .spinner {
+  margin: 0 auto;
+}
+
+/* Animation for step transitions */
+@keyframes slideInLeft {
+  from {
+    transform: translateX(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.join-step:not(.hidden) {
+  animation: slideInLeft var(--transition-base);
+}
+
+/* Mobile optimizations */
+@media (max-width: 640px) {
+  .join-container {
+    padding: var(--space-4);
+  }
+
+  .join-header h1 {
+    font-size: var(--font-size-2xl);
+  }
+
+  .join-form-container {
+    padding: var(--space-6);
+  }
+
+  #room-code-input {
+    font-size: var(--font-size-3xl);
+    padding: var(--space-5);
+  }
+}
+
+/* Landscape mode adjustments */
+@media (max-height: 500px) {
+  .join-header {
+    margin-bottom: var(--space-4);
+  }
+
+  .join-form-container {
+    padding: var(--space-4);
+  }
+
+  .btn-xl {
+    min-height: 3rem;
+    padding: var(--space-4) var(--space-8);
+  }
+}
