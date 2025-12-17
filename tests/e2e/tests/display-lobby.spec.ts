@@ -155,8 +155,8 @@ test.describe('Display Lobby (TV/Projector View)', () => {
 
       await playerJoinPage.joinRoom(roomCode, testPlayers.player1.name);
 
-      // Wait for update
-      await displayPage.page.waitForTimeout(2000);
+      // Wait for waiting message to become hidden
+      await displayPage.waitingMessage.waitFor({ state: 'hidden', timeout: 5000 });
 
       const isWaitingVisible = await displayPage.isWaitingMessageVisible();
       expect(isWaitingVisible).toBe(false);
