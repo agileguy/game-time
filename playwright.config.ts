@@ -14,7 +14,7 @@ export default defineConfig({
   reporter: 'html',
 
   use: {
-    baseURL: 'http://localhost:8001',
+    baseURL: 'http://localhost:7000',
     trace: 'on-first-retry',
   },
 
@@ -43,8 +43,8 @@ export default defineConfig({
   ],
 
   webServer: {
-    command: 'cd backend && uvicorn app.main:app --host 0.0.0.0 --port 8000',
-    url: 'http://localhost:8000/health',
+    command: 'cd backend && source .venv/bin/activate && uvicorn app.main:app --host 0.0.0.0 --port 7000',
+    url: 'http://localhost:7000/health/ready',
     reuseExistingServer: !process.env.CI,
     timeout: 120 * 1000,
   },
