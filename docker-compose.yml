@@ -1,0 +1,64 @@
+version: '3.8'
+
+services:
+  # PostgreSQL database
+  postgres:
+    image: postgres:15-alpine
+    container_name: gametime_postgres
+    environment:
+      POSTGRES_USER: gametime_user
+      POSTGRES_PASSWORD: gametime_pass
+      POSTGRES_DB: gametime
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U gametime_user -d gametime"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis cache
+  redis:
+    image: redis:7-alpine
+    container_name: gametime_redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    command: redis-server --appendonly yes
+
+  # FastAPI backend
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.dev
+    container_name: gametime_backend
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://gametime_user:gametime_pass@postgres:5432/gametime
+      - REDIS_URL=redis://redis:6379/0
+      - DEBUG=True
+      - RELOAD=True
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+      - /app/.venv  # Exclude venv from volume mount
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    stdin_open: true
+    tty: true
+
+volumes:
+  postgres_data:
+  redis_data:

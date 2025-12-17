@@ -7,6 +7,35 @@ A real-time multiplayer party game system inspired by Jackbox, where players use
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.104+-green.svg)](https://fastapi.tiangolo.com/)
 [![PostgreSQL 15+](https://img.shields.io/badge/PostgreSQL-15+-blue.svg)](https://www.postgresql.org/)
 
+## Project Status
+
+🚧 **Currently in Development** - Phase 1 (Foundation & Infrastructure) Complete
+
+### Completed
+- ✅ **Phase 1: Foundation & Infrastructure**
+  - FastAPI backend with health checks
+  - PostgreSQL database with SQLAlchemy async models
+  - Redis connection and rate limiting
+  - Security foundation (session management, input validation)
+  - Comprehensive test infrastructure (pytest + Playwright)
+  - Docker development environment
+  - Database migrations (Alembic)
+  - Code quality tools (ruff, mypy, pre-commit hooks)
+
+### In Progress
+- 🔨 **Phase 2: Room & Lobby System**
+  - Room creation and management
+  - Player join/leave functionality
+  - WebSocket infrastructure
+  - Lobby UI (display + controller)
+
+### Planned
+- ⏳ **Phase 3**: Game Framework
+- ⏳ **Phase 4**: Horse Race Game
+- ⏳ **Phase 5**: Trivia Game
+- ⏳ **Phase 6**: Memory Game
+- ⏳ **Phase 7**: Polish & Production Testing
+
 ## Features
 
 ### Core Gameplay
