@@ -45,7 +45,7 @@ export default defineConfig({
   ],
 
   webServer: {
-    command: 'cd backend && .venv/bin/uvicorn app.main:app --host 0.0.0.0 --port 7000',
+    command: 'cd backend && TESTING=true .venv/bin/uvicorn app.main:app --host 0.0.0.0 --port 7000',
     url: 'http://localhost:7000/health/ready',
     reuseExistingServer: !process.env.CI,
     timeout: 120 * 1000,

@@ -59,6 +59,13 @@ class Settings(BaseSettings):
         default=60, description="WS messages per minute per connection"
     )
 
+    def __init__(self, **kwargs):
+        """Initialize settings and disable rate limiting in testing mode."""
+        super().__init__(**kwargs)
+        # Automatically disable rate limiting when in testing mode
+        if self.testing:
+            self.enable_rate_limiting = False
+
     # Game Settings
     max_players_per_room: int = Field(default=12, description="Maximum players per room")
     min_players_per_room: int = Field(default=2, description="Minimum players per room")

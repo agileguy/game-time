@@ -1,11 +1,18 @@
 """Unit tests for rate limiting."""
 
-from unittest.mock import AsyncMock, MagicMock
+from unittest.mock import AsyncMock
 
 import pytest
 
+from app.config import settings
 from app.core.exceptions import RateLimitExceededError
 from app.core.rate_limit import RateLimiter, get_rate_limiter
+
+
+@pytest.fixture(autouse=True)
+def enable_rate_limiting_for_tests(monkeypatch):
+    """Enable rate limiting for these specific tests."""
+    monkeypatch.setattr(settings, "enable_rate_limiting", True)
 
 
 @pytest.fixture
@@ -79,9 +86,7 @@ class TestRateLimiter:
         mock_redis.ttl.assert_called_once_with("test:key")
         mock_redis.incr.assert_not_called()
 
-    async def test_check_rate_limit_disabled(
-        self, rate_limiter, mock_redis, mock_settings
-    ):
+    async def test_check_rate_limit_disabled(self, rate_limiter, mock_redis, mock_settings):
         """Test rate limit check when rate limiting is disabled."""
         result = await rate_limiter.check_rate_limit(
             key="test:key",
@@ -148,9 +153,7 @@ class TestRateLimiter:
         assert key.startswith("rate_limit:api_requests:")
         assert call_args[0][1] == 60  # 1 minute window
 
-    async def test_check_api_request_limit_exceeded(
-        self, rate_limiter, mock_redis, mock_settings
-    ):
+    async def test_check_api_request_limit_exceeded(self, rate_limiter, mock_redis, mock_settings):
         """Test API request rate limit when exceeded."""
         mock_settings.enable_rate_limiting = True
         mock_redis.get.return_value = "100"  # At limit
@@ -252,9 +255,7 @@ class TestRateLimiterIntegration:
 
         # Third request
         mock_redis.get.return_value = "2"
-        result = await rate_limiter.check_rate_limit(
-            "test:key", limit=3, window_seconds=60
-        )
+        result = await rate_limiter.check_rate_limit("test:key", limit=3, window_seconds=60)
 
         assert result is True
         assert mock_redis.incr.call_count == 2  # Called for 2nd and 3rd requests

@@ -1,6 +1,7 @@
 """Pytest configuration and shared fixtures."""
 
 import asyncio
+import os
 from collections.abc import AsyncGenerator, Generator
 
 import pytest
@@ -9,8 +10,17 @@ from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.pool import NullPool
 
-from app.config import settings
+# Set testing mode environment variable BEFORE importing settings
+os.environ["TESTING"] = "true"
+
+from app.config import Settings, settings
 from app.models import Base
+
+# Reinitialize settings to pick up the TESTING environment variable
+if not settings.testing:
+    # Force reload of settings with TESTING=true
+    import app.config
+    app.config.settings = Settings(testing=True)
 
 # Test database URL (uses a separate test database)
 # Use same user as main database, just different database name
