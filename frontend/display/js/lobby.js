@@ -243,12 +243,13 @@ class DisplayLobbyController {
    */
   updatePlayers(players) {
     const maxPlayers = appState.get('maxPlayers') || 12;
+    const connectedPlayers = players.filter((p) => p.connected);
 
-    // Update player count
-    this.elements.playerCount.textContent = `${players.length} / ${maxPlayers}`;
+    // Update player count (only count connected players)
+    this.elements.playerCount.textContent = `${connectedPlayers.length} / ${maxPlayers}`;
 
-    // Show/hide waiting message
-    if (players.length === 0) {
+    // Show/hide waiting message (based on connected players)
+    if (connectedPlayers.length === 0) {
       this.elements.waitingMessage.classList.remove('hidden');
       this.elements.playersGrid.innerHTML = '';
     } else {

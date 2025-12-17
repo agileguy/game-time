@@ -292,9 +292,10 @@ class LobbyController {
    * @param {Array} players - Players array
    */
   updatePlayers(players) {
-    // Update player count
+    // Update player count (only count connected players)
     const maxPlayers = appState.get('maxPlayers') || 12;
-    this.elements.playerCount.textContent = `${players.length} / ${maxPlayers}`;
+    const connectedPlayers = players.filter((p) => p.connected);
+    this.elements.playerCount.textContent = `${connectedPlayers.length} / ${maxPlayers}`;
 
     // Update players list
     updatePlayerList(this.elements.playersList, players, {
