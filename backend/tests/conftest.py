@@ -1,15 +1,15 @@
 """Pytest configuration and shared fixtures."""
 
-import pytest
 import asyncio
-from typing import AsyncGenerator, Generator
-from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
-from sqlalchemy.pool import NullPool
+from collections.abc import AsyncGenerator, Generator
+
+import pytest
 import redis.asyncio as aioredis
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+from sqlalchemy.pool import NullPool
 
-from app.models import Base
 from app.config import settings
-
+from app.models import Base
 
 # Test database URL (uses a separate test database)
 # Use same user as main database, just different database name

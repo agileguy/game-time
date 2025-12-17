@@ -1,16 +1,17 @@
 """Game session database model."""
 
 from datetime import datetime
-from typing import Optional, TYPE_CHECKING, List
-from sqlalchemy import String, Integer, ForeignKey, CheckConstraint, Index
+from typing import TYPE_CHECKING, Optional
+
+from sqlalchemy import CheckConstraint, ForeignKey, Index, Integer, String
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.base import Base
 
 if TYPE_CHECKING:
-    from app.models.room import Room
     from app.models.player import Player
+    from app.models.room import Room
     from app.models.score import Score
 
 
@@ -55,13 +56,13 @@ class GameSession(Base):
         default=datetime.utcnow,
     )
 
-    finished_at: Mapped[Optional[datetime]] = mapped_column(
+    finished_at: Mapped[datetime | None] = mapped_column(
         nullable=True,
         index=True,
     )
 
     # Winner (nullable if game not finished or no clear winner)
-    winner_id: Mapped[Optional[int]] = mapped_column(
+    winner_id: Mapped[int | None] = mapped_column(
         Integer,
         ForeignKey("players.id"),
         nullable=True,
@@ -78,7 +79,7 @@ class GameSession(Base):
         foreign_keys=[winner_id],
     )
 
-    scores: Mapped[List["Score"]] = relationship(
+    scores: Mapped[list["Score"]] = relationship(
         "Score",
         back_populates="game_session",
         cascade="all, delete-orphan",
@@ -109,7 +110,7 @@ class GameSession(Base):
         return self.finished_at is not None
 
     @property
-    def duration(self) -> Optional[float]:
+    def duration(self) -> float | None:
         """
         Get game duration in seconds.
 

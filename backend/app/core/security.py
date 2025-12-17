@@ -1,9 +1,8 @@
 """Security utilities for session management and validation."""
 
+import hashlib
 import secrets
 import string
-import hashlib
-from typing import Optional
 from datetime import datetime, timedelta
 
 from app.config import settings
@@ -19,7 +18,7 @@ def generate_session_id() -> str:
     return secrets.token_hex(32)
 
 
-def generate_room_code(length: Optional[int] = None) -> str:
+def generate_room_code(length: int | None = None) -> str:
     """
     Generate a unique room code.
 

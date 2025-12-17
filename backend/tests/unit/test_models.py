@@ -1,9 +1,8 @@
 """Unit tests for database models."""
 
-import pytest
 from datetime import datetime
 
-from app.models import Room, Player, GameSession, Score
+from app.models import GameSession, Player, Room, Score
 
 
 class TestRoomModel:

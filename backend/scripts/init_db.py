@@ -7,8 +7,8 @@ from pathlib import Path
 # Add parent directory to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from app.database import init_db
 from app.core.logging import logger
+from app.database import init_db
 
 
 async def main() -> None:

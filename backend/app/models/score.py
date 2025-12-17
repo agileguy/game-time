@@ -2,7 +2,8 @@
 
 from datetime import datetime
 from typing import TYPE_CHECKING
-from sqlalchemy import String, Integer, ForeignKey, CheckConstraint, Index, UniqueConstraint
+
+from sqlalchemy import CheckConstraint, ForeignKey, Index, Integer, UniqueConstraint
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 

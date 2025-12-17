@@ -1,17 +1,16 @@
 """Unit tests for security utilities."""
 
-import pytest
 from datetime import datetime, timedelta
 
 from app.core.security import (
-    generate_session_id,
     generate_room_code,
-    validate_room_code,
-    validate_player_name,
-    sanitize_player_name,
-    hash_ip_address,
+    generate_session_id,
     get_session_expiry,
+    hash_ip_address,
     is_session_expired,
+    sanitize_player_name,
+    validate_player_name,
+    validate_room_code,
     validate_session_id,
 )
 

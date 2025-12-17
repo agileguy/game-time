@@ -1,7 +1,8 @@
 """Redis client configuration and connection management."""
 
-from typing import Optional
+
 import redis.asyncio as aioredis
+
 from app.config import settings
 
 
@@ -10,7 +11,7 @@ class RedisClient:
 
     def __init__(self) -> None:
         """Initialize Redis client."""
-        self._redis: Optional[aioredis.Redis] = None
+        self._redis: aioredis.Redis | None = None
 
     async def connect(self) -> None:
         """Establish Redis connection."""

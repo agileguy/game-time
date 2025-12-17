@@ -1,6 +1,6 @@
 """Application configuration using Pydantic settings."""
 
-from typing import List
+
 from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -56,7 +56,9 @@ class Settings(BaseSettings):
     enable_rate_limiting: bool = Field(default=True, description="Enable rate limiting")
     rate_limit_room_creation: int = Field(default=5, description="Room creation per hour per IP")
     rate_limit_api_requests: int = Field(default=100, description="API requests per minute per IP")
-    rate_limit_ws_messages: int = Field(default=60, description="WS messages per minute per connection")
+    rate_limit_ws_messages: int = Field(
+        default=60, description="WS messages per minute per connection"
+    )
 
     # Game Settings
     max_players_per_room: int = Field(default=12, description="Maximum players per room")
@@ -90,7 +92,7 @@ class Settings(BaseSettings):
         return v
 
     @property
-    def cors_origins(self) -> List[str]:
+    def cors_origins(self) -> list[str]:
         """Parse allowed origins from comma-separated string."""
         return [origin.strip() for origin in self.allowed_origins.split(",")]
 

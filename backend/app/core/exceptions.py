@@ -1,6 +1,6 @@
 """Custom exceptions for the application."""
 
-from typing import Any, Dict, Optional
+from typing import Any
 
 
 class GameTimeException(Exception):
@@ -10,7 +10,7 @@ class GameTimeException(Exception):
         self,
         message: str,
         status_code: int = 500,
-        details: Optional[Dict[str, Any]] = None,
+        details: dict[str, Any] | None = None,
     ) -> None:
         """
         Initialize exception.
@@ -29,7 +29,7 @@ class GameTimeException(Exception):
 class ValidationError(GameTimeException):
     """Validation error."""
 
-    def __init__(self, message: str, details: Optional[Dict[str, Any]] = None) -> None:
+    def __init__(self, message: str, details: dict[str, Any] | None = None) -> None:
         """Initialize validation error."""
         super().__init__(message, status_code=400, details=details)
 

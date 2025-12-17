@@ -1,8 +1,8 @@
 """Room database model."""
 
 from datetime import datetime
-from typing import Optional, List
-from sqlalchemy import String, Integer, Boolean, CheckConstraint, Index
+
+from sqlalchemy import Boolean, CheckConstraint, Index, Integer, String
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -38,13 +38,13 @@ class Room(Base, TimestampMixin):
     )
 
     # Current game being played
-    current_game: Mapped[Optional[str]] = mapped_column(
+    current_game: Mapped[str | None] = mapped_column(
         String(50),
         nullable=True,
     )
 
     # Host player ID
-    host_player_id: Mapped[Optional[int]] = mapped_column(
+    host_player_id: Mapped[int | None] = mapped_column(
         Integer,
         nullable=True,
     )
@@ -79,13 +79,13 @@ class Room(Base, TimestampMixin):
     )
 
     # Relationships
-    players: Mapped[List["Player"]] = relationship(
+    players: Mapped[list["Player"]] = relationship(  # type: ignore[name-defined]
         "Player",
         back_populates="room",
         cascade="all, delete-orphan",
     )
 
-    game_sessions: Mapped[List["GameSession"]] = relationship(
+    game_sessions: Mapped[list["GameSession"]] = relationship(  # type: ignore[name-defined]
         "GameSession",
         back_populates="room",
         cascade="all, delete-orphan",

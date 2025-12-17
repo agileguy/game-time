@@ -1,7 +1,5 @@
 """Rate limiting utilities using Redis."""
 
-from typing import Optional
-from datetime import timedelta
 import redis.asyncio as aioredis
 
 from app.config import settings

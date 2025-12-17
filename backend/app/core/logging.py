@@ -1,14 +1,15 @@
 """Structured logging configuration using loguru."""
 
-import sys
 import json
-from typing import Any, Dict
+import sys
+from typing import Any
+
 from loguru import logger
 
 from app.config import settings
 
 
-def serialize_log_record(record: Dict[str, Any]) -> str:
+def serialize_log_record(record: dict[str, Any]) -> str:
     """
     Serialize log record to JSON format.
 

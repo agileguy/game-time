@@ -1,8 +1,9 @@
 """Player database model."""
 
 from datetime import datetime
-from typing import Optional, TYPE_CHECKING
-from sqlalchemy import String, Integer, Boolean, ForeignKey, CheckConstraint, Index
+from typing import TYPE_CHECKING
+
+from sqlalchemy import Boolean, CheckConstraint, ForeignKey, Index, Integer, String
 from sqlalchemy.dialects.postgresql import INET
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -72,12 +73,12 @@ class Player(Base):
     )
 
     # Connection metadata (for security/debugging)
-    ip_address: Mapped[Optional[str]] = mapped_column(
+    ip_address: Mapped[str | None] = mapped_column(
         INET,
         nullable=True,
     )
 
-    user_agent: Mapped[Optional[str]] = mapped_column(
+    user_agent: Mapped[str | None] = mapped_column(
         String,
         nullable=True,
     )

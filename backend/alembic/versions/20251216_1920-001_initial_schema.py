@@ -6,17 +6,18 @@ Create Date: 2025-12-16 19:20:00.000000
 
 """
 
-from typing import Sequence, Union
+from collections.abc import Sequence
 
-from alembic import op
 import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
 
+from alembic import op
+
 # revision identifiers, used by Alembic.
 revision: str = "001"
-down_revision: Union[str, None] = None
-branch_labels: Union[str, Sequence[str], None] = None
-depends_on: Union[str, Sequence[str], None] = None
+down_revision: str | None = None
+branch_labels: str | Sequence[str] | None = None
+depends_on: str | Sequence[str] | None = None
 
 
 def upgrade() -> None:
@@ -30,11 +31,28 @@ def upgrade() -> None:
         sa.Column("current_game", sa.String(length=50), nullable=True),
         sa.Column("host_player_id", sa.Integer(), nullable=True),
         sa.Column("max_players", sa.Integer(), nullable=False, server_default="12"),
-        sa.Column("settings", postgresql.JSONB(astext_type=sa.Text()), nullable=False, server_default="{}"),
+        sa.Column(
+            "settings", postgresql.JSONB(astext_type=sa.Text()), nullable=False, server_default="{}"
+        ),
         sa.Column("is_public", sa.Boolean(), nullable=False, server_default="true"),
-        sa.Column("last_activity", sa.DateTime(timezone=True), nullable=False, server_default=sa.text("NOW()")),
-        sa.Column("created_at", sa.DateTime(timezone=True), nullable=False, server_default=sa.text("NOW()")),
-        sa.Column("updated_at", sa.DateTime(timezone=True), nullable=False, server_default=sa.text("NOW()")),
+        sa.Column(
+            "last_activity",
+            sa.DateTime(timezone=True),
+            nullable=False,
+            server_default=sa.text("NOW()"),
+        ),
+        sa.Column(
+            "created_at",
+            sa.DateTime(timezone=True),
+            nullable=False,
+            server_default=sa.text("NOW()"),
+        ),
+        sa.Column(
+            "updated_at",
+            sa.DateTime(timezone=True),
+            nullable=False,
+            server_default=sa.text("NOW()"),
+        ),
         sa.CheckConstraint("status IN ('lobby', 'playing', 'finished')", name="valid_status"),
         sa.CheckConstraint(
             "current_game IN ('horse_race', 'trivia', 'memory') OR current_game IS NULL",
@@ -58,8 +76,12 @@ def upgrade() -> None:
         sa.Column("session_id", sa.String(length=128), nullable=False),
         sa.Column("is_host", sa.Boolean(), nullable=False, server_default="false"),
         sa.Column("connected", sa.Boolean(), nullable=False, server_default="true"),
-        sa.Column("joined_at", sa.DateTime(timezone=True), nullable=False, server_default=sa.text("NOW()")),
-        sa.Column("last_seen", sa.DateTime(timezone=True), nullable=False, server_default=sa.text("NOW()")),
+        sa.Column(
+            "joined_at", sa.DateTime(timezone=True), nullable=False, server_default=sa.text("NOW()")
+        ),
+        sa.Column(
+            "last_seen", sa.DateTime(timezone=True), nullable=False, server_default=sa.text("NOW()")
+        ),
         sa.Column("ip_address", postgresql.INET(), nullable=True),
         sa.Column("user_agent", sa.String(), nullable=True),
         sa.CheckConstraint(
@@ -86,8 +108,15 @@ def upgrade() -> None:
         sa.Column("id", sa.Integer(), autoincrement=True, nullable=False),
         sa.Column("room_id", sa.Integer(), nullable=False),
         sa.Column("game_type", sa.String(length=50), nullable=False),
-        sa.Column("state", postgresql.JSONB(astext_type=sa.Text()), nullable=False, server_default="{}"),
-        sa.Column("started_at", sa.DateTime(timezone=True), nullable=False, server_default=sa.text("NOW()")),
+        sa.Column(
+            "state", postgresql.JSONB(astext_type=sa.Text()), nullable=False, server_default="{}"
+        ),
+        sa.Column(
+            "started_at",
+            sa.DateTime(timezone=True),
+            nullable=False,
+            server_default=sa.text("NOW()"),
+        ),
         sa.Column("finished_at", sa.DateTime(timezone=True), nullable=True),
         sa.Column("winner_id", sa.Integer(), nullable=True),
         sa.CheckConstraint(
@@ -113,9 +142,19 @@ def upgrade() -> None:
         sa.Column("game_session_id", sa.Integer(), nullable=False),
         sa.Column("player_id", sa.Integer(), nullable=False),
         sa.Column("score", sa.Integer(), nullable=False, server_default="0"),
-        sa.Column("round_scores", postgresql.JSONB(astext_type=sa.Text()), nullable=False, server_default="[]"),
+        sa.Column(
+            "round_scores",
+            postgresql.JSONB(astext_type=sa.Text()),
+            nullable=False,
+            server_default="[]",
+        ),
         sa.Column("bonus_points", sa.Integer(), nullable=False, server_default="0"),
-        sa.Column("created_at", sa.DateTime(timezone=True), nullable=False, server_default=sa.text("NOW()")),
+        sa.Column(
+            "created_at",
+            sa.DateTime(timezone=True),
+            nullable=False,
+            server_default=sa.text("NOW()"),
+        ),
         sa.CheckConstraint("score >= 0", name="valid_score"),
         sa.CheckConstraint("bonus_points >= 0", name="valid_bonus_points"),
         sa.ForeignKeyConstraint(["game_session_id"], ["game_sessions.id"], ondelete="CASCADE"),
