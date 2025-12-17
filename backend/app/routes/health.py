@@ -2,6 +2,7 @@
 
 import redis.asyncio as aioredis
 from fastapi import APIRouter, Depends
+from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
@@ -34,7 +35,7 @@ async def database_health(db: AsyncSession = Depends(get_db)):
     """
     try:
         # Execute a simple query
-        await db.execute("SELECT 1")
+        await db.execute(text("SELECT 1"))
         return {"status": "healthy", "database": "connected"}
     except Exception as e:
         return {"status": "unhealthy", "database": "error", "error": str(e)}
@@ -80,7 +81,7 @@ async def full_health_check(
 
     # Check database
     try:
-        await db.execute("SELECT 1")
+        await db.execute(text("SELECT 1"))
     except Exception as e:
         db_healthy = False
         errors.append(f"Database: {str(e)}")

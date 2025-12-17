@@ -5,6 +5,7 @@ from collections.abc import AsyncGenerator, Generator
 
 import pytest
 import redis.asyncio as aioredis
+from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.pool import NullPool
 
@@ -78,9 +79,15 @@ async def db_session(test_engine) -> AsyncGenerator[AsyncSession, None]:
     )
 
     async with async_session() as session:
+        yield session
+
+        # Clean up all data after each test
+        await session.rollback()
         async with session.begin():
-            yield session
-            await session.rollback()
+            # Delete all data from tables in reverse order of dependencies
+            await session.execute(text("DELETE FROM players"))
+            await session.execute(text("DELETE FROM rooms"))
+            await session.commit()
 
 
 @pytest.fixture

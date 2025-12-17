@@ -148,6 +148,10 @@ class RoomManager:
         if not validate_player_name(player_name):
             raise ValidationError("Invalid player name")
 
+        # Expire all to ensure fresh data from database
+        # This prevents stale player counts when checking if room is full
+        self.db.expire_all()
+
         # Get room
         room = await self.get_room_by_code(code)
         if not room:
@@ -199,10 +203,31 @@ class RoomManager:
         if not player:
             return None
 
-        room = player.room
+        if not player.room:
+            return None
 
-        # Mark player as disconnected
-        player.connected = False
+        # Store room_id before expiring
+        room_id = player.room.id
+
+        # Expire all to ensure fresh data from database
+        self.db.expire_all()
+
+        # Load room with all players for host transfer
+        room_result = await self.db.execute(
+            select(Room)
+            .where(Room.id == room_id)
+            .options(selectinload(Room.players))
+        )
+        room = room_result.scalar_one_or_none()
+
+        # Find the player within room.players and mark as disconnected
+        # This ensures we're working with the same object instance
+        for p in room.players:
+            if p.id == player.id:
+                p.connected = False
+                player = p  # Use this instance
+                break
+
         await self.db.flush()
 
         # If player was host, transfer to another player
