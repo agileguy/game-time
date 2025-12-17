@@ -220,19 +220,29 @@ class RoomManager:
         )
         room = room_result.scalar_one_or_none()
 
-        # Find the player within room.players and mark as disconnected
-        # This ensures we're working with the same object instance
+        # Find the player within room.players
+        player_to_remove = None
         for p in room.players:
             if p.id == player.id:
-                p.connected = False
-                player = p  # Use this instance
+                player_to_remove = p
                 break
 
+        if not player_to_remove:
+            return room, None
+
+        # Check if player is host before removing
+        was_host = player_to_remove.is_host
+
+        # Remove player from room (delete from database)
+        await self.db.delete(player_to_remove)
         await self.db.flush()
+
+        # Refresh room to get updated player list
+        await self.db.refresh(room)
 
         # If player was host, transfer to another player
         new_host = None
-        if player.is_host and room:
+        if was_host and room:
             new_host = await self._transfer_host(room)
 
         # Update room activity
@@ -277,8 +287,8 @@ class RoomManager:
         if player.id == kicker.id:
             raise ValidationError("Cannot kick yourself")
 
-        # Mark as disconnected
-        player.connected = False
+        # Delete player from room
+        await self.db.delete(player)
         await self.db.flush()
 
         return True

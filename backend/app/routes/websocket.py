@@ -440,6 +440,8 @@ async def handle_message(
 
         # Broadcast updated room state
         if room:
+            # Refresh room to get updated player list after deletion
+            await db.refresh(room)
             await send_room_state_to_all(room, room_code, room_manager, player_manager)
 
         return
@@ -470,6 +472,11 @@ async def handle_message(
                     },
                     room_code=room_code,
                 )
+
+                # Broadcast updated room state after kick
+                room = await room_manager.get_room_by_code(room_code)
+                if room:
+                    await send_room_state_to_all(room, room_code, room_manager, player_manager)
             except ValidationError as e:
                 await connection_manager.send_error(str(e), connection_id, "FORBIDDEN")
 
