@@ -690,6 +690,10 @@ MEMORY_CONFIG = {
 - Test database fixtures
 - Mock WebSocket client
 - Coverage configuration (>80% target)
+- Playwright setup for E2E tests
+  - Install Playwright and browsers
+  - Basic playwright.config.ts
+  - Simple smoke test (server responds)
 
 **Deliverables:**
 - Running FastAPI server with health checks
@@ -697,6 +701,7 @@ MEMORY_CONFIG = {
 - Redis connected
 - Basic test suite passing
 - Docker development environment
+- First browser automation test (Playwright smoke test)
 
 ### Phase 2: Room & Lobby System (Week 1-2)
 
