@@ -6,6 +6,8 @@ A real-time multiplayer party game system inspired by Jackbox, where players use
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.104+-green.svg)](https://fastapi.tiangolo.com/)
 [![PostgreSQL 15+](https://img.shields.io/badge/PostgreSQL-15+-blue.svg)](https://www.postgresql.org/)
+[![CI](https://github.com/yourusername/game-time/actions/workflows/ci.yml/badge.svg)](https://github.com/yourusername/game-time/actions/workflows/ci.yml)
+[![E2E Tests](https://github.com/yourusername/game-time/actions/workflows/e2e.yml/badge.svg)](https://github.com/yourusername/game-time/actions/workflows/e2e.yml)
 
 ## Project Status
 

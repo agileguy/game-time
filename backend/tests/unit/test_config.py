@@ -9,9 +9,12 @@ from app.config import Settings
 class TestSettings:
     """Tests for Settings configuration."""
 
-    def test_default_settings(self):
+    def test_default_settings(self, monkeypatch):
         """Test default settings values."""
-        settings = Settings()
+        # Clear environment to test defaults
+        monkeypatch.delenv("DEBUG", raising=False)
+
+        settings = Settings(_env_file=None)
 
         assert settings.app_name == "Game Time"
         assert settings.debug is False

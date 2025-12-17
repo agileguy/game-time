@@ -12,6 +12,7 @@ from app.config import settings
 
 
 # Test database URL (uses a separate test database)
+# Use same user as main database, just different database name
 TEST_DATABASE_URL = settings.database_url.replace("/gametime", "/gametime_test")
 TEST_REDIS_URL = settings.redis_url.replace("/0", "/1")
 
