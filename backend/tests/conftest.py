@@ -13,7 +13,10 @@ from app.models import Base
 
 # Test database URL (uses a separate test database)
 # Use same user as main database, just different database name
-TEST_DATABASE_URL = settings.database_url.replace("/gametime", "/gametime_test")
+# Be careful to only replace the database name, not the username
+TEST_DATABASE_URL = settings.database_url.replace(
+    "localhost:5432/gametime", "localhost:5432/gametime_test"
+)
 TEST_REDIS_URL = settings.redis_url.replace("/0", "/1")
 
 

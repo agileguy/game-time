@@ -44,6 +44,18 @@ class TestRoomModel:
         assert room.max_players == 12
         assert room.is_public is True
 
+    async def test_room_repr(self, db_session):
+        """Test room string representation."""
+        room = Room(code="TEST", status="lobby")
+        db_session.add(room)
+        await db_session.flush()
+
+        repr_str = repr(room)
+        assert "Room" in repr_str
+        assert str(room.id) in repr_str
+        assert "TEST" in repr_str
+        assert "lobby" in repr_str
+
 
 class TestPlayerModel:
     """Tests for Player model."""
@@ -107,6 +119,25 @@ class TestPlayerModel:
 
         assert player.room == room
         assert player in room.players
+
+    async def test_player_repr(self, db_session):
+        """Test player string representation."""
+        room = Room(code="ABCD")
+        db_session.add(room)
+        await db_session.flush()
+
+        player = Player(
+            room_id=room.id,
+            name="TestPlayer",
+            session_id="a" * 64,
+        )
+        db_session.add(player)
+        await db_session.flush()
+
+        repr_str = repr(player)
+        assert "Player" in repr_str
+        assert str(player.id) in repr_str
+        assert "TestPlayer" in repr_str
 
 
 class TestGameSessionModel:
@@ -174,6 +205,24 @@ class TestGameSessionModel:
 
         assert game_session.duration is not None
         assert game_session.duration >= 0
+
+    async def test_game_session_repr(self, db_session):
+        """Test game session string representation."""
+        room = Room(code="ABCD")
+        db_session.add(room)
+        await db_session.flush()
+
+        game_session = GameSession(
+            room_id=room.id,
+            game_type="trivia",
+        )
+        db_session.add(game_session)
+        await db_session.flush()
+
+        repr_str = repr(game_session)
+        assert "GameSession" in repr_str
+        assert str(game_session.id) in repr_str
+        assert "trivia" in repr_str
 
 
 class TestScoreModel:
@@ -276,3 +325,38 @@ class TestScoreModel:
         await db_session.flush()
 
         assert score.round_scores == [100, 100, 100]
+
+    async def test_score_repr(self, db_session):
+        """Test score string representation."""
+        room = Room(code="ABCD")
+        db_session.add(room)
+        await db_session.flush()
+
+        player = Player(
+            room_id=room.id,
+            name="Alice",
+            session_id="a" * 64,
+        )
+        db_session.add(player)
+        await db_session.flush()
+
+        game_session = GameSession(
+            room_id=room.id,
+            game_type="trivia",
+        )
+        db_session.add(game_session)
+        await db_session.flush()
+
+        score = Score(
+            game_session_id=game_session.id,
+            player_id=player.id,
+            score=150,
+        )
+        db_session.add(score)
+        await db_session.flush()
+
+        repr_str = repr(score)
+        assert "Score" in repr_str
+        assert str(score.id) in repr_str
+        assert str(player.id) in repr_str
+        assert "150" in repr_str
