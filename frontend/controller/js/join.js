@@ -132,13 +132,17 @@ class JoinController {
    */
   async handleRoomCodeSubmit() {
     const roomCode = this.elements.roomCodeInput.value.trim().toUpperCase();
+    logger.info('Room code submit:', roomCode);
 
     // Validate room code
     if (!validators.isValidRoomCode(roomCode)) {
+      logger.error('Invalid room code, showing notification');
       notifications.error('Please enter a valid 4-character room code');
       this.elements.roomCodeInput.focus();
       return;
     }
+
+    logger.info('Room code valid, checking if room exists');
 
     // Check if room exists
     this.showLoading();

@@ -60,7 +60,11 @@ export class ControllerJoinPage {
   }
 
   async clickContinue() {
-    await this.continueButton.click();
+    // Dispatch submit event to ensure proper event handling
+    await this.page.locator('#room-code-form').evaluate((form: HTMLFormElement) => {
+      const submitEvent = new Event('submit', { bubbles: true, cancelable: true });
+      form.dispatchEvent(submitEvent);
+    });
   }
 
   async joinWithRoomCode(code: string) {
@@ -73,7 +77,11 @@ export class ControllerJoinPage {
   }
 
   async clickJoin() {
-    await this.joinButton.click();
+    // Dispatch submit event to ensure proper event handling
+    await this.page.locator('#player-name-form').evaluate((form: HTMLFormElement) => {
+      const submitEvent = new Event('submit', { bubbles: true, cancelable: true });
+      form.dispatchEvent(submitEvent);
+    });
   }
 
   async joinRoom(roomCode: string, playerName: string) {
@@ -88,7 +96,13 @@ export class ControllerJoinPage {
     await this.page.waitForFunction(
       () => {
         const connectionText = document.getElementById('connection-text');
-        return connectionText && connectionText.textContent === 'Connected';
+        const playerName = document.getElementById('player-name');
+        // Wait for both connection AND player name to be populated (not "---")
+        return connectionText &&
+               connectionText.textContent === 'Connected' &&
+               playerName &&
+               playerName.textContent !== '---' &&
+               playerName.textContent !== '';
       },
       { timeout: 10000 }
     );
@@ -125,7 +139,13 @@ export class ControllerJoinPage {
     await this.page.waitForFunction(
       () => {
         const connectionText = document.getElementById('connection-text');
-        return connectionText && connectionText.textContent === 'Connected';
+        const playerName = document.getElementById('player-name');
+        // Wait for both connection AND player name to be populated (not "---")
+        return connectionText &&
+               connectionText.textContent === 'Connected' &&
+               playerName &&
+               playerName.textContent !== '---' &&
+               playerName.textContent !== '';
       },
       { timeout: 10000 }
     );

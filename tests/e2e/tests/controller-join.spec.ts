@@ -138,11 +138,14 @@ test.describe('Controller Join Flow', () => {
           await joinPage.enterRoomCode(invalidCode);
           await joinPage.clickContinue();
 
-          // Should show validation error
+          // Should show error (either validation or room not found)
           await joinPage.page.waitForTimeout(500);
           await expect(joinPage.notification).toBeVisible();
           const notificationText = await joinPage.getNotificationText();
-          expect(notificationText).toContain('valid');
+
+          // Note: Some codes like "12345", "ABCDE", "abc1" get auto-formatted (truncated/uppercased)
+          // due to input maxlength and toUpperCase(), so they pass validation but fail at API level
+          expect(notificationText).toMatch(/valid|not found/i);
 
           // Should stay on room code step
           await expect(joinPage.roomCodeInput).toBeVisible();

@@ -32,7 +32,7 @@ export class NotificationManager {
   init() {
     this.container = dom.createElement('div', {
       className: 'notification-container',
-      id: 'notifications',
+      id: 'notification-container',
     });
 
     document.body.appendChild(this.container);
