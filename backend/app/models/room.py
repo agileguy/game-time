@@ -3,12 +3,17 @@
 from __future__ import annotations
 
 from datetime import datetime
+from typing import TYPE_CHECKING
 
 from sqlalchemy import Boolean, CheckConstraint, Index, Integer, String
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.base import Base, TimestampMixin
+
+if TYPE_CHECKING:
+    from app.models.game_session import GameSession
+    from app.models.player import Player
 
 
 class Room(Base, TimestampMixin):
@@ -81,13 +86,13 @@ class Room(Base, TimestampMixin):
     )
 
     # Relationships
-    players: Mapped[list["Player"]] = relationship(  # noqa: F821  # type: ignore
+    players: Mapped[list[Player]] = relationship(  # noqa: F821  # type: ignore
         "Player",
         back_populates="room",
         cascade="all, delete-orphan",
     )
 
-    game_sessions: Mapped[list["GameSession"]] = relationship(  # noqa: F821  # type: ignore
+    game_sessions: Mapped[list[GameSession]] = relationship(  # noqa: F821  # type: ignore
         "GameSession",
         back_populates="room",
         cascade="all, delete-orphan",
