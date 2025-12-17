@@ -21,6 +21,8 @@ ignore = [
 [tool.ruff.lint.per-file-ignores]
 "__init__.py" = ["F401"]  # Allow unused imports in __init__.py
 "tests/*" = ["B011"]  # Allow assert False in tests
+"app/models/*.py" = ["F821"]  # Allow forward references in SQLAlchemy models
+"scripts/*.py" = ["E402"]  # Allow imports after sys.path modification in scripts
 
 [tool.ruff.lint.isort]
 known-first-party = ["app"]
@@ -40,7 +42,7 @@ warn_no_return = true
 
 [tool.bandit]
 exclude_dirs = ["tests", "alembic"]
-skips = ["B101"]  # Allow assert statements
+skips = ["B101", "B104"]  # Allow assert statements, allow binding to all interfaces (Docker)
 
 [tool.coverage.run]
 source = ["app"]

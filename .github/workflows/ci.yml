@@ -72,7 +72,7 @@ jobs:
           --health-retries 5
 
     env:
-      DATABASE_URL: postgresql+asyncpg://gametime_user:gametime_pass@localhost:5432/gametime
+      DATABASE_URL: postgresql+asyncpg://gametime_user:gametime_pass@localhost:5432/gametime_test
       REDIS_URL: redis://localhost:6379/0
       TESTING: true
 
