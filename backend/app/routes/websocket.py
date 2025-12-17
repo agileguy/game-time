@@ -217,6 +217,9 @@ async def websocket_endpoint(
                         new_host: Optional[PlayerModel] = await room_manager._transfer_host(room)
                         await db.commit()
 
+                        # Refresh room to get latest state
+                        await db.refresh(room)
+
                         if new_host:
                             logger.info(f"Host transferred to player {new_host.id} ({new_host.name})")
                             # Broadcast host transfer event

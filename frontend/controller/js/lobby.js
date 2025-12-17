@@ -358,7 +358,7 @@ class LobbyController {
 
     // Send start game message
     this.ws.send('start_game');
-    notifications.info('Starting game...');
+    // Note: Don't show notification here - game_starting event will handle it
   }
 
   /**
