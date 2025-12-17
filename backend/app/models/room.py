@@ -1,5 +1,7 @@
 """Room database model."""
 
+from __future__ import annotations
+
 from datetime import datetime
 
 from sqlalchemy import Boolean, CheckConstraint, Index, Integer, String
