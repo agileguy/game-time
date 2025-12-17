@@ -10,6 +10,7 @@ from fastapi.responses import JSONResponse
 from app.config import settings
 from app.database import close_db, init_db
 from app.redis_client import redis_client
+from app.routes import health, rooms, websocket
 
 
 @asynccontextmanager
@@ -45,6 +46,11 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Register routers
+app.include_router(health.router)
+app.include_router(rooms.router)
+app.include_router(websocket.router)
 
 
 @app.get("/health", tags=["Health"])
