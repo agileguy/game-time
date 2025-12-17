@@ -143,8 +143,12 @@ test.describe('Display Lobby (TV/Projector View)', () => {
       const freshDisplay = new DisplayLobbyPage(page);
       await freshDisplay.goto();
 
-      const isWaitingVisible = await freshDisplay.isWaitingMessageVisible();
-      expect(isWaitingVisible).toBe(true);
+      // Wait for status message to appear
+      await freshDisplay.statusMessage.waitFor({ state: 'visible', timeout: 5000 });
+
+      // When no room code is set, display should show status message
+      const statusMessage = await freshDisplay.statusMessage.textContent();
+      expect(statusMessage).toContain('Please create or join a room');
     });
 
     test('should hide waiting message when players join', async ({ browser }) => {

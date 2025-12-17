@@ -22,6 +22,9 @@ class DisplayLobbyController {
    * Initialize controller
    */
   async init() {
+    // Cache elements first so showStatusMessage can use them
+    this.cacheElements();
+
     // Check session
     this.sessionId = storage.getSessionId();
     this.roomCode = storage.getRoomCode();
@@ -32,7 +35,6 @@ class DisplayLobbyController {
       return;
     }
 
-    this.cacheElements();
     this.setupStateSubscriptions();
     await this.connectWebSocket();
     this.updateJoinUrl();
