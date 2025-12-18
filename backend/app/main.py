@@ -54,54 +54,6 @@ app.include_router(rooms.router)
 app.include_router(websocket.router)
 
 
-@app.get("/health", tags=["Health"])
-async def health_check() -> JSONResponse:
-    """
-    Health check endpoint.
-
-    Returns:
-        JSONResponse: Health status
-    """
-    return JSONResponse(
-        content={
-            "status": "healthy",
-            "service": settings.app_name,
-            "version": "0.1.0",
-        }
-    )
-
-
-@app.get("/health/ready", tags=["Health"])
-async def readiness_check() -> JSONResponse:
-    """
-    Readiness check endpoint.
-
-    Verifies database and Redis connections.
-
-    Returns:
-        JSONResponse: Readiness status
-    """
-    try:
-        # Check Redis connection
-        await redis_client.client.ping()  # type: ignore[misc]
-
-        return JSONResponse(
-            content={
-                "status": "ready",
-                "database": "connected",
-                "redis": "connected",
-            }
-        )
-    except Exception as e:
-        return JSONResponse(
-            status_code=503,
-            content={
-                "status": "not ready",
-                "error": str(e),
-            },
-        )
-
-
 @app.get("/", tags=["Root"])
 async def root() -> JSONResponse:
     """

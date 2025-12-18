@@ -17,9 +17,9 @@ async def health_check():
     Basic health check.
 
     Returns:
-        dict: Health status
+        dict: Health status with version
     """
-    return {"status": "healthy", "service": "game-time"}
+    return {"status": "healthy", "service": "game-time", "version": "0.1.0"}
 
 
 @router.get("/db")
@@ -58,6 +58,35 @@ async def redis_health(redis: aioredis.Redis = Depends(get_redis)):
         return {"status": "healthy", "redis": "connected"}
     except Exception as e:
         return {"status": "unhealthy", "redis": "error", "error": str(e)}
+
+
+@router.get("/ready")
+async def readiness_check(redis: aioredis.Redis = Depends(get_redis)):
+    """
+    Readiness check endpoint.
+
+    Verifies database and Redis connections.
+
+    Args:
+        redis: Redis client
+
+    Returns:
+        dict: Readiness status
+    """
+    try:
+        # Check Redis connection
+        await redis.ping()  # type: ignore[misc]
+
+        return {
+            "status": "ready",
+            "database": "connected",
+            "redis": "connected",
+        }
+    except Exception as e:
+        return {
+            "status": "not ready",
+            "error": str(e),
+        }
 
 
 @router.get("/full")
