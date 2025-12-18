@@ -1,7 +1,8 @@
 """Health check endpoints."""
 
 import redis.asyncio as aioredis
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, status
+from fastapi.responses import JSONResponse
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -31,14 +32,20 @@ async def database_health(db: AsyncSession = Depends(get_db)):
         db: Database session
 
     Returns:
-        dict: Database health status
+        JSONResponse: Database health status with appropriate status code
     """
     try:
         # Execute a simple query
         await db.execute(text("SELECT 1"))
-        return {"status": "healthy", "database": "connected"}
+        return JSONResponse(
+            content={"status": "healthy", "database": "connected"},
+            status_code=status.HTTP_200_OK,
+        )
     except Exception as e:
-        return {"status": "unhealthy", "database": "error", "error": str(e)}
+        return JSONResponse(
+            content={"status": "unhealthy", "database": "error", "error": str(e)},
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+        )
 
 
 @router.get("/redis")
@@ -50,43 +57,62 @@ async def redis_health(redis: aioredis.Redis = Depends(get_redis)):
         redis: Redis client
 
     Returns:
-        dict: Redis health status
+        JSONResponse: Redis health status with appropriate status code
     """
     try:
         # Ping Redis
         await redis.ping()  # type: ignore[misc]
-        return {"status": "healthy", "redis": "connected"}
+        return JSONResponse(
+            content={"status": "healthy", "redis": "connected"},
+            status_code=status.HTTP_200_OK,
+        )
     except Exception as e:
-        return {"status": "unhealthy", "redis": "error", "error": str(e)}
+        return JSONResponse(
+            content={"status": "unhealthy", "redis": "error", "error": str(e)},
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+        )
 
 
 @router.get("/ready")
-async def readiness_check(redis: aioredis.Redis = Depends(get_redis)):
+async def readiness_check(
+    db: AsyncSession = Depends(get_db),
+    redis: aioredis.Redis = Depends(get_redis),
+):
     """
     Readiness check endpoint.
 
     Verifies database and Redis connections.
 
     Args:
+        db: Database session
         redis: Redis client
 
     Returns:
-        dict: Readiness status
+        JSONResponse: Readiness status with appropriate status code
     """
     try:
+        # Check database connection
+        await db.execute(text("SELECT 1"))
+
         # Check Redis connection
         await redis.ping()  # type: ignore[misc]
 
-        return {
-            "status": "ready",
-            "database": "connected",
-            "redis": "connected",
-        }
+        return JSONResponse(
+            content={
+                "status": "ready",
+                "database": "connected",
+                "redis": "connected",
+            },
+            status_code=status.HTTP_200_OK,
+        )
     except Exception as e:
-        return {
-            "status": "not ready",
-            "error": str(e),
-        }
+        return JSONResponse(
+            content={
+                "status": "not ready",
+                "error": str(e),
+            },
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+        )
 
 
 @router.get("/full")
@@ -102,7 +128,7 @@ async def full_health_check(
         redis: Redis client
 
     Returns:
-        dict: Full health status
+        JSONResponse: Full health status with appropriate status code
     """
     db_healthy = True
     redis_healthy = True
@@ -124,9 +150,14 @@ async def full_health_check(
 
     overall_healthy = db_healthy and redis_healthy
 
-    return {
-        "status": "healthy" if overall_healthy else "unhealthy",
-        "database": "connected" if db_healthy else "error",
-        "redis": "connected" if redis_healthy else "error",
-        "errors": errors if errors else None,
-    }
+    return JSONResponse(
+        content={
+            "status": "healthy" if overall_healthy else "unhealthy",
+            "database": "connected" if db_healthy else "error",
+            "redis": "connected" if redis_healthy else "error",
+            "errors": errors if errors else None,
+        },
+        status_code=status.HTTP_200_OK
+        if overall_healthy
+        else status.HTTP_503_SERVICE_UNAVAILABLE,
+    )
