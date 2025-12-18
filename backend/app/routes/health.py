@@ -1,7 +1,5 @@
 """Health check endpoints."""
 
-from typing import cast
-
 import redis.asyncio as aioredis
 from fastapi import APIRouter, Depends
 from sqlalchemy import text
