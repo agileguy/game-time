@@ -248,11 +248,11 @@ class ConnectionManager:
         except WebSocketDisconnect:
             raise
         except ValidationError as e:
-            raise WebSocketError(f"Invalid message format: {e}")
-        except json.JSONDecodeError:
-            raise WebSocketError("Invalid JSON")
+            raise WebSocketError(f"Invalid message format: {e}") from e
+        except json.JSONDecodeError as e:
+            raise WebSocketError("Invalid JSON") from e
         except Exception as e:
-            raise WebSocketError(f"Error receiving message: {e}")
+            raise WebSocketError(f"Error receiving message: {e}") from e
 
     async def send_error(self, error: str, connection_id: str, code: str = "ERROR"):
         """

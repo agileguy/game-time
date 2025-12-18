@@ -49,7 +49,7 @@ async def create_room(
     try:
         await rate_limiter.check_room_creation_limit(client_ip)
     except Exception as e:
-        raise HTTPException(status_code=429, detail=str(e))
+        raise HTTPException(status_code=429, detail=str(e)) from e
 
     # Create managers
     room_manager = RoomManager(db)
@@ -79,10 +79,10 @@ async def create_room(
         )
 
     except ValidationError as e:
-        raise HTTPException(status_code=400, detail=e.message)
+        raise HTTPException(status_code=400, detail=e.message) from e
     except Exception:
         await db.rollback()
-        raise HTTPException(status_code=500, detail="Failed to create room")
+        raise HTTPException(status_code=500, detail="Failed to create room") from None
 
 
 @router.post("/{code}/join", response_model=JoinRoomResponse)
@@ -133,14 +133,14 @@ async def join_room(
         )
 
     except RoomNotFoundError as e:
-        raise HTTPException(status_code=404, detail=e.message)
+        raise HTTPException(status_code=404, detail=e.message) from e
     except RoomFullError as e:
-        raise HTTPException(status_code=409, detail=e.message)
+        raise HTTPException(status_code=409, detail=e.message) from e
     except ValidationError as e:
-        raise HTTPException(status_code=400, detail=e.message)
+        raise HTTPException(status_code=400, detail=e.message) from e
     except Exception:
         await db.rollback()
-        raise HTTPException(status_code=500, detail="Failed to join room")
+        raise HTTPException(status_code=500, detail="Failed to join room") from None
 
 
 @router.get("/{code}", response_model=RoomDetailResponse)
@@ -185,4 +185,4 @@ async def get_room(
     except HTTPException:
         raise
     except Exception:
-        raise HTTPException(status_code=500, detail="Failed to get room")
+        raise HTTPException(status_code=500, detail="Failed to get room") from None
