@@ -44,7 +44,7 @@ async def create_room(
         HTTPException: If validation fails or rate limit exceeded
     """
     # Rate limit check
-    client_ip = request.client.host
+    client_ip = request.client.host if request.client else "unknown"
     rate_limiter = RateLimiter(redis)
     try:
         await rate_limiter.check_room_creation_limit(client_ip)

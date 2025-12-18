@@ -4,7 +4,7 @@ import json
 import sys
 from typing import Any
 
-from loguru import logger
+from loguru import Logger, logger
 
 from app.config import settings
 
@@ -81,12 +81,12 @@ def configure_logging() -> None:
         )
 
 
-def get_logger() -> logger:  # type: ignore[valid-type]
+def get_logger() -> Logger:
     """
     Get configured logger instance.
 
     Returns:
-        logger: Configured loguru logger
+        Logger: Configured loguru logger
     """
     return logger
 

@@ -1,5 +1,7 @@
 """Health check endpoints."""
 
+from typing import cast
+
 import redis.asyncio as aioredis
 from fastapi import APIRouter, Depends
 from sqlalchemy import text
@@ -54,7 +56,7 @@ async def redis_health(redis: aioredis.Redis = Depends(get_redis)):
     """
     try:
         # Ping Redis
-        await redis.ping()
+        await redis.ping()  # type: ignore[misc]
         return {"status": "healthy", "redis": "connected"}
     except Exception as e:
         return {"status": "unhealthy", "redis": "error", "error": str(e)}
@@ -88,7 +90,7 @@ async def full_health_check(
 
     # Check Redis
     try:
-        await redis.ping()
+        await redis.ping()  # type: ignore[misc]
     except Exception as e:
         redis_healthy = False
         errors.append(f"Redis: {str(e)}")

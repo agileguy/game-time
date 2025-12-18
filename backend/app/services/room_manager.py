@@ -213,6 +213,9 @@ class RoomManager:
         )
         room = room_result.scalar_one_or_none()
 
+        if not room:
+            return None, None
+
         # Find the player within room.players
         player_to_remove = None
         for p in room.players:

@@ -157,7 +157,7 @@ class PlayerManager:
             Optional[str]: Connection ID if found
         """
         connection_id = await self.redis.get(f"connection:{session_id}")
-        return connection_id
+        return connection_id.decode() if connection_id else None
 
     async def get_player_room(self, session_id: str) -> str | None:
         """
@@ -170,7 +170,7 @@ class PlayerManager:
             Optional[str]: Room code if found
         """
         room_code = await self.redis.get(f"player_room:{session_id}")
-        return room_code
+        return room_code.decode() if room_code else None
 
     async def remove_connection(self, session_id: str) -> None:
         """
