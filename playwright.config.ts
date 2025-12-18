@@ -49,7 +49,7 @@ export default defineConfig({
       ? 'cd backend && TESTING=true uvicorn app.main:app --host 0.0.0.0 --port 7000'
       : 'cd backend && TESTING=true .venv/bin/uvicorn app.main:app --host 0.0.0.0 --port 7000',
     url: 'http://localhost:7000/health/ready',
-    reuseExistingServer: !process.env.CI,
+    reuseExistingServer: true,  // Always reuse - CI workflow starts servers manually
     timeout: 120 * 1000,
   },
 });
