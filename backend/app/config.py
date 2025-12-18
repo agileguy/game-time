@@ -22,7 +22,7 @@ class Settings(BaseSettings):
         description="Secret key for signing",
     )
     allowed_origins: str = Field(
-        default="http://localhost:3000,http://localhost:8000",
+        default="http://localhost:3000,http://localhost:7070,http://localhost:8000",
         description="Comma-separated list of allowed CORS origins",
     )
 
@@ -58,6 +58,13 @@ class Settings(BaseSettings):
     rate_limit_ws_messages: int = Field(
         default=60, description="WS messages per minute per connection"
     )
+
+    def __init__(self, **kwargs):
+        """Initialize settings and disable rate limiting in testing mode."""
+        super().__init__(**kwargs)
+        # Automatically disable rate limiting when in testing mode
+        if self.testing:
+            self.enable_rate_limiting = False
 
     # Game Settings
     max_players_per_room: int = Field(default=12, description="Maximum players per room")

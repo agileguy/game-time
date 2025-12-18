@@ -218,6 +218,7 @@ dump.rdb
 
 # Playwright
 test-results/
+test-results-trace/
 playwright-report/
 playwright/.cache/
 

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <title>Game Time - Lobby</title>
+
+  <!-- Shared CSS -->
+  <link rel="stylesheet" href="../shared/css/reset.css">
+  <link rel="stylesheet" href="../shared/css/variables.css">
+  <link rel="stylesheet" href="../shared/css/typography.css">
+  <link rel="stylesheet" href="../shared/css/utilities.css">
+
+  <!-- Controller CSS -->
+  <link rel="stylesheet" href="css/lobby.css">
+</head>
+<body class="controller-view">
+  <div class="lobby-container full-height">
+    <!-- Header -->
+    <header class="lobby-header">
+      <div class="room-code-display">
+        <span class="text-secondary text-sm">Room Code</span>
+        <div id="room-code" class="room-code font-mono">----</div>
+      </div>
+
+      <div class="connection-status">
+        <span id="connection-indicator" class="connection-dot disconnected"></span>
+        <span id="connection-text" class="text-xs">Connecting...</span>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="lobby-main">
+      <!-- Player Info Card -->
+      <div class="player-info-card card mb-6">
+        <div class="flex-between">
+          <div>
+            <div class="text-sm text-secondary mb-1">Your Name</div>
+            <div id="player-name" class="heading-4">---</div>
+          </div>
+          <div id="host-badge" class="hidden">
+            <span class="badge badge-warning">HOST</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Players Section -->
+      <section class="players-section">
+        <div class="section-header flex-between mb-4">
+          <h2 class="heading-4">Players</h2>
+          <div id="player-count" class="text-secondary text-sm">0 / 12</div>
+        </div>
+
+        <div id="players-list" class="player-list">
+          <!-- Player cards will be inserted here -->
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer Actions -->
+    <footer class="lobby-footer">
+      <!-- Host Controls -->
+      <div id="host-controls" class="host-controls hidden">
+        <button id="start-game-btn" class="btn btn-success btn-lg w-full mb-3" disabled>
+          Start Game
+        </button>
+      </div>
+
+      <!-- Player Controls -->
+      <div id="player-controls" class="player-controls">
+        <button id="leave-room-btn" class="btn btn-error btn-lg w-full">
+          Leave Room
+        </button>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Scripts -->
+  <script type="module" src="js/lobby.js"></script>
+</body>
+</html>

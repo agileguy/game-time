@@ -2,9 +2,12 @@
 
 import json
 import sys
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from loguru import logger
+
+if TYPE_CHECKING:
+    from loguru._logger import Logger
 
 from app.config import settings
 
@@ -81,14 +84,14 @@ def configure_logging() -> None:
         )
 
 
-def get_logger() -> logger:  # type: ignore[valid-type]
+def get_logger() -> "Logger":
     """
     Get configured logger instance.
 
     Returns:
-        logger: Configured loguru logger
+        Logger: Configured loguru logger
     """
-    return logger
+    return logger  # type: ignore[return-value]
 
 
 # Configure logging on module import

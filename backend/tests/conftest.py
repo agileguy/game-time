@@ -1,19 +1,34 @@
 """Pytest configuration and shared fixtures."""
 
 import asyncio
+import os
 from collections.abc import AsyncGenerator, Generator
 
 import pytest
 import redis.asyncio as aioredis
+from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.pool import NullPool
 
-from app.config import settings
-from app.models import Base
+# Set testing mode environment variable BEFORE importing settings
+os.environ["TESTING"] = "true"
+
+from app.config import Settings, settings  # noqa: E402
+from app.models import Base  # noqa: E402
+
+# Reinitialize settings to pick up the TESTING environment variable
+if not settings.testing:
+    # Force reload of settings with TESTING=true
+    import app.config
+
+    app.config.settings = Settings(testing=True)
 
 # Test database URL (uses a separate test database)
 # Use same user as main database, just different database name
-TEST_DATABASE_URL = settings.database_url.replace("/gametime", "/gametime_test")
+# Be careful to only replace the database name, not the username
+TEST_DATABASE_URL = settings.database_url.replace(
+    "localhost:5432/gametime", "localhost:5432/gametime_test"
+)
 TEST_REDIS_URL = settings.redis_url.replace("/0", "/1")
 
 
@@ -75,9 +90,15 @@ async def db_session(test_engine) -> AsyncGenerator[AsyncSession, None]:
     )
 
     async with async_session() as session:
+        yield session
+
+        # Clean up all data after each test
+        await session.rollback()
         async with session.begin():
-            yield session
-            await session.rollback()
+            # Delete all data from tables in reverse order of dependencies
+            await session.execute(text("DELETE FROM players"))
+            await session.execute(text("DELETE FROM rooms"))
+            await session.commit()
 
 
 @pytest.fixture

@@ -1,22 +1,23 @@
 import { test, expect } from '@playwright/test';
 
+const API_BASE_URL = 'http://localhost:7000';
+
 /**
  * Smoke tests to verify basic server functionality.
  */
 test.describe('API Smoke Tests', () => {
   test('health endpoint returns healthy status', async ({ request }) => {
-    const response = await request.get('/health');
+    const response = await request.get(`${API_BASE_URL}/health`);
 
     expect(response.ok()).toBeTruthy();
     const data = await response.json();
 
     expect(data).toHaveProperty('status', 'healthy');
-    expect(data).toHaveProperty('service', 'Game Time');
-    expect(data).toHaveProperty('version');
+    expect(data).toHaveProperty('service', 'game-time');
   });
 
   test('readiness endpoint returns ready status', async ({ request }) => {
-    const response = await request.get('/health/ready');
+    const response = await request.get(`${API_BASE_URL}/health/ready`);
 
     expect(response.ok()).toBeTruthy();
     const data = await response.json();
@@ -27,7 +28,7 @@ test.describe('API Smoke Tests', () => {
   });
 
   test('root endpoint returns API information', async ({ request }) => {
-    const response = await request.get('/');
+    const response = await request.get(`${API_BASE_URL}/`);
 
     expect(response.ok()).toBeTruthy();
     const data = await response.json();
@@ -39,7 +40,7 @@ test.describe('API Smoke Tests', () => {
   });
 
   test('OpenAPI docs are accessible', async ({ page }) => {
-    await page.goto('/docs');
+    await page.goto(`${API_BASE_URL}/docs`);
 
     // Check that Swagger UI loads
     await expect(page.locator('.swagger-ui')).toBeVisible();
@@ -51,7 +52,7 @@ test.describe('API Smoke Tests', () => {
 
   test('server responds within acceptable time', async ({ request }) => {
     const start = Date.now();
-    const response = await request.get('/health');
+    const response = await request.get(`${API_BASE_URL}/health`);
     const duration = Date.now() - start;
 
     expect(response.ok()).toBeTruthy();

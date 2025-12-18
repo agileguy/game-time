@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <title>Game Time - Join Room</title>
+
+  <!-- Shared CSS -->
+  <link rel="stylesheet" href="../shared/css/reset.css">
+  <link rel="stylesheet" href="../shared/css/variables.css">
+  <link rel="stylesheet" href="../shared/css/typography.css">
+  <link rel="stylesheet" href="../shared/css/utilities.css">
+
+  <!-- Controller CSS -->
+  <link rel="stylesheet" href="css/join.css">
+</head>
+<body class="controller-view">
+  <div class="full-screen flex-center">
+    <div class="join-container">
+      <!-- Header -->
+      <header class="join-header">
+        <h1 class="heading-2 text-primary">GAME TIME</h1>
+        <p class="text-secondary mt-2">Join a game room</p>
+      </header>
+
+      <!-- Join Form -->
+      <div class="join-form-container">
+        <!-- Step 1: Enter Room Code -->
+        <div id="step-room-code" class="join-step">
+          <h2 class="heading-3 mb-4">Enter Room Code</h2>
+
+          <form id="room-code-form">
+            <div class="form-group">
+              <label for="room-code-input" class="form-label">4-Digit Code</label>
+              <input
+                type="text"
+                id="room-code-input"
+                class="input input-lg font-mono text-center uppercase"
+                placeholder="XXXX"
+                maxlength="4"
+                autocomplete="off"
+                autofocus
+                required
+              >
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-xl mt-6 w-full">
+              Continue
+            </button>
+          </form>
+
+          <div class="divider mt-6 mb-6"></div>
+
+          <button id="create-room-btn" class="btn btn-secondary btn-lg w-full">
+            Create New Room
+          </button>
+        </div>
+
+        <!-- Step 2: Enter Player Name -->
+        <div id="step-player-name" class="join-step hidden">
+          <button id="back-btn" class="btn btn-outline mb-4">
+            ← Back
+          </button>
+
+          <h2 class="heading-3 mb-4">Enter Your Name</h2>
+
+          <form id="player-name-form">
+            <div class="form-group">
+              <label for="player-name-input" class="form-label">Player Name</label>
+              <input
+                type="text"
+                id="player-name-input"
+                class="input input-lg"
+                placeholder="Enter your name"
+                maxlength="50"
+                autocomplete="off"
+                required
+              >
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-xl mt-6 w-full">
+              Join Game
+            </button>
+          </form>
+        </div>
+
+        <!-- Loading State -->
+        <div id="loading-state" class="join-step hidden text-center">
+          <div class="spinner spinner-lg mb-4"></div>
+          <p class="text-secondary">Joining room...</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Create Room Modal -->
+  <div id="create-room-modal" class="modal hidden">
+    <div class="modal-overlay"></div>
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="heading-3">Create New Room</h2>
+        <button id="modal-close-btn" class="btn btn-outline btn-sm">✕</button>
+      </div>
+
+      <form id="create-room-form" class="modal-body">
+        <div class="form-group">
+          <label for="host-name-input" class="form-label">Your Name</label>
+          <input
+            type="text"
+            id="host-name-input"
+            class="input input-lg"
+            placeholder="Enter your name"
+            maxlength="50"
+            autocomplete="off"
+            required
+          >
+        </div>
+
+        <div class="form-group">
+          <label for="max-players-input" class="form-label">Max Players</label>
+          <input
+            type="number"
+            id="max-players-input"
+            class="input input-lg"
+            value="12"
+            min="2"
+            max="20"
+            required
+          >
+        </div>
+
+        <div class="form-group">
+          <label class="checkbox-label">
+            <input type="checkbox" id="public-room-checkbox" checked>
+            <span>Public Room</span>
+          </label>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" id="modal-cancel-btn" class="btn btn-outline btn-lg">
+            Cancel
+          </button>
+          <button type="submit" id="create-room-submit" class="btn btn-primary btn-lg">
+            Create Room
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script type="module" src="js/join.js"></script>
+</body>
+</html>

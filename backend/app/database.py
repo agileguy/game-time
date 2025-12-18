@@ -13,6 +13,12 @@ engine = create_async_engine(
     pool_size=settings.database_pool_size,
     max_overflow=settings.database_max_overflow,
     pool_pre_ping=True,  # Verify connections before using
+    pool_timeout=30,  # Wait max 30 seconds for a connection from pool
+    pool_recycle=3600,  # Recycle connections after 1 hour
+    connect_args={
+        "timeout": 10,  # Connection timeout in seconds
+        "command_timeout": 30,  # Command timeout in seconds
+    },
 )
 
 # Create async session factory
