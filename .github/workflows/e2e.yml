@@ -65,19 +65,29 @@ jobs:
       - name: Install Playwright browsers
         run: npx playwright install --with-deps chromium
 
+      - name: Start frontend server
+        working-directory: frontend
+        run: |
+          python3 -m http.server 7070 > /tmp/frontend-server.log 2>&1 &
+          sleep 2
+
       - name: Start backend server
         working-directory: backend
         run: |
-          uvicorn app.main:app --host 127.0.0.1 --port 8001 &
+          TESTING=true uvicorn app.main:app --host 127.0.0.1 --port 7000 &
           sleep 5
         env:
           DATABASE_URL: postgresql+asyncpg://gametime_user:gametime_pass@localhost:5432/gametime
           REDIS_URL: redis://localhost:6379/0
           PYTHONPATH: ${{ github.workspace }}/backend
 
-      - name: Wait for server
+      - name: Wait for backend server
         run: |
-          timeout 30 bash -c 'until curl -f http://localhost:8001/health; do sleep 1; done'
+          timeout 30 bash -c 'until curl -f http://localhost:7000/health/ready; do sleep 1; done'
+
+      - name: Wait for frontend server
+        run: |
+          timeout 30 bash -c 'until curl -f http://localhost:7070/controller/join.html; do sleep 1; done'
 
       - name: Run Playwright tests
         run: npx playwright test --project=chromium
