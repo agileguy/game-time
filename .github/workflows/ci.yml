@@ -98,7 +98,7 @@ jobs:
 
       - name: Run pytest with coverage
         run: |
-          pytest tests/unit -v \
+          pytest tests/unit tests/integration -v \
             --ignore=tests/unit/test_models.py \
             --cov=app \
             --cov-report=xml \

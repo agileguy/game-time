@@ -1,6 +1,5 @@
 """Unit tests for utils module."""
 
-
 import app.utils
 from app.utils import (
     generate_room_code,

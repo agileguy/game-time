@@ -20,6 +20,7 @@ from app.models import Base
 if not settings.testing:
     # Force reload of settings with TESTING=true
     import app.config
+
     app.config.settings = Settings(testing=True)
 
 # Test database URL (uses a separate test database)
