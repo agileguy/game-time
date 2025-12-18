@@ -13,8 +13,8 @@ from sqlalchemy.pool import NullPool
 # Set testing mode environment variable BEFORE importing settings
 os.environ["TESTING"] = "true"
 
-from app.config import Settings, settings
-from app.models import Base
+from app.config import Settings, settings  # noqa: E402
+from app.models import Base  # noqa: E402
 
 # Reinitialize settings to pick up the TESTING environment variable
 if not settings.testing:
