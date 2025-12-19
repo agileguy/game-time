@@ -224,10 +224,10 @@ class HorseRaceDisplayController {
     this.elements.bettingPhase.classList.remove('hidden');
 
     // Render horse preview
-    this.renderHorsePreview(data.round_data?.horses || []);
+    this.renderHorsePreview(data.horses || []);
 
     // Start countdown
-    const bettingDuration = data.round_data?.betting_duration || 15;
+    const bettingDuration = data.betting_duration || 15;
     this.startBettingCountdown(bettingDuration);
   }
 
@@ -299,7 +299,7 @@ class HorseRaceDisplayController {
     }
 
     // Render track lanes
-    this.renderRaceTrack(data.round_data?.horses || []);
+    this.renderRaceTrack(data.horses || []);
 
     // Update phase timer
     this.elements.phaseTimer.textContent = '🏁';
@@ -335,8 +335,8 @@ class HorseRaceDisplayController {
    * Update race positions
    */
   updateRacePositions(data) {
-    const horses = data.round_data?.horses || [];
-    const trackLength = data.round_data?.track_length || 100;
+    const horses = data.horses || [];
+    const trackLength = 100; // Fixed track length
 
     horses.forEach((horse, index) => {
       const lane = this.elements.raceTrack.querySelector(
@@ -376,10 +376,10 @@ class HorseRaceDisplayController {
     this.elements.resultsPhase.classList.remove('hidden');
 
     // Render podium
-    this.renderPodium(data.round_data?.horses || []);
+    this.renderPodium(data.horses || []);
 
     // Render player standings
-    this.renderPlayerStandings(data.scores || {}, data.round_data?.horses || []);
+    this.renderPlayerStandings(data.all_scores || {}, data.horses || []);
 
     // Update phase timer
     this.elements.phaseTimer.textContent = '🏆';
@@ -393,7 +393,7 @@ class HorseRaceDisplayController {
 
     // Sort horses by position (descending to get finished order)
     const finishedHorses = [...horses]
-      .filter((h) => h.position >= (this.gameState?.round_data?.track_length || 100))
+      .filter((h) => h.position >= 100)
       .sort((a, b) => {
         // If both finished, compare by who finished first (higher position means finished earlier in tie)
         return b.position - a.position;

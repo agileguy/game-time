@@ -196,8 +196,11 @@ class HorseRaceController {
     this.elements.roundDisplay.textContent = `Round ${currentRound} of ${totalRounds}`;
 
     // Get initial player score
-    if (data.scores && this.sessionId) {
-      this.playerScore = data.scores[this.sessionId] || 0;
+    if (data.all_scores && this.sessionId) {
+      this.playerScore = data.all_scores[this.sessionId] || 0;
+      this.elements.playerScore.textContent = this.playerScore;
+    } else if (data.your_score !== undefined) {
+      this.playerScore = data.your_score;
       this.elements.playerScore.textContent = this.playerScore;
     }
 
@@ -214,8 +217,11 @@ class HorseRaceController {
     this.gameState = data;
 
     // Update scores
-    if (data.scores && this.sessionId) {
-      this.playerScore = data.scores[this.sessionId] || 0;
+    if (data.all_scores && this.sessionId) {
+      this.playerScore = data.all_scores[this.sessionId] || 0;
+      this.elements.playerScore.textContent = this.playerScore;
+    } else if (data.your_score !== undefined) {
+      this.playerScore = data.your_score;
       this.elements.playerScore.textContent = this.playerScore;
     }
 
@@ -286,10 +292,10 @@ class HorseRaceController {
     this.elements.bettingPhase.classList.remove('hidden');
 
     // Render horse selection
-    this.renderHorseSelection(data.round_data?.horses || []);
+    this.renderHorseSelection(data.horses || []);
 
     // Start countdown
-    const bettingDuration = data.round_data?.betting_duration || 15;
+    const bettingDuration = data.betting_duration || 15;
     this.startBettingCountdown(bettingDuration);
 
     // If player already has a bet, show it
@@ -380,7 +386,7 @@ class HorseRaceController {
    * Show current bet
    */
   showCurrentBet(horseId) {
-    const horses = this.gameState?.round_data?.horses || [];
+    const horses = this.gameState?.horses || [];
     const horse = horses[horseId];
 
     if (!horse) return;
@@ -427,7 +433,7 @@ class HorseRaceController {
 
     // Show bet reminder
     if (this.currentBet !== null) {
-      const horses = data.round_data?.horses || [];
+      const horses = data.horses || [];
       const horse = horses[this.currentBet];
       if (horse) {
         this.elements.betReminderHorse.textContent = horse.name;
@@ -436,7 +442,7 @@ class HorseRaceController {
     }
 
     // Render race positions
-    this.renderRacePositions(data.round_data?.horses || []);
+    this.renderRacePositions(data.horses || []);
 
     // Update phase timer
     this.elements.phaseTimer.textContent = '🏁';
@@ -476,8 +482,8 @@ class HorseRaceController {
    * Update race positions
    */
   updateRacePositions(data) {
-    const horses = data.round_data?.horses || [];
-    const trackLength = data.round_data?.track_length || 100;
+    const horses = data.horses || [];
+    const trackLength = 100; // Fixed track length
 
     horses.forEach((horse, index) => {
       const posBar = this.elements.racePositions.querySelector(
@@ -506,8 +512,8 @@ class HorseRaceController {
     this.elements.resultsPhase.classList.remove('hidden');
 
     // Determine win/loss
-    const horses = data.round_data?.horses || [];
-    const trackLength = data.round_data?.track_length || 100;
+    const horses = data.horses || [];
+    const trackLength = 100;
 
     // Sort horses by position
     const sortedHorses = [...horses]
@@ -520,7 +526,7 @@ class HorseRaceController {
 
     // Calculate points earned this round
     const previousScore = this.playerScore;
-    const newScore = data.scores?.[this.sessionId] || 0;
+    const newScore = data.all_scores?.[this.sessionId] || data.your_score || 0;
     const pointsEarned = newScore - previousScore;
 
     // Update win status

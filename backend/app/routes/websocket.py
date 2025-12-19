@@ -90,6 +90,26 @@ async def websocket_endpoint(
             logger.error(f"Failed to send room state: {e}", exc_info=True)
             raise
 
+        # If game is active, send current game state
+        if room.status == "playing" and room.current_game:
+            try:
+                from app.services.game_manager import get_game_manager
+
+                game_manager = get_game_manager()
+                player_state = await game_manager.get_state_for_player(
+                    room_code, session_id
+                )
+                await connection_manager.send_personal_message(
+                    message={
+                        "type": "game_state_update",
+                        "data": player_state,
+                    },
+                    connection_id=connection_id,
+                )
+                logger.info(f"Sent game state to connection {connection_id}")
+            except Exception as e:
+                logger.error(f"Failed to send game state: {e}", exc_info=True)
+
         # Notify others that player joined
         player_joined_msg = {
             "type": "player_joined",
@@ -564,7 +584,10 @@ async def handle_message(
             await connection_manager.send_personal_message(
                 message={
                     "type": "game_action_response",
-                    "data": response,
+                    "data": {
+                        "action": action,
+                        **response,
+                    },
                 },
                 connection_id=connection_id,
             )

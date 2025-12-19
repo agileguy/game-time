@@ -29,6 +29,11 @@ class HorseRace(BaseGame):
     HORSE_NAMES = ["Thunder", "Lightning", "Storm", "Blaze"]
     HORSE_COLORS = ["#FF6B6B", "#4ECDC4", "#45B7D1", "#FFA07A"]
 
+    def __init__(self, room_code: str, player_ids: list[str]):
+        """Initialize horse race game."""
+        super().__init__(room_code, player_ids)
+        self._race_task: asyncio.Task | None = None
+
     @classmethod
     def game_type(cls) -> str:
         """Return game type identifier."""
@@ -93,11 +98,29 @@ class HorseRace(BaseGame):
             betting_duration=self.BETTING_DURATION,
         )
 
+        # Schedule race to start after betting duration
+        self._race_task = asyncio.create_task(self._auto_start_race())
+
         return {
             "phase": self.state.phase.value,
             "horses": self.state.round_data["horses"],
             "betting_duration": self.BETTING_DURATION,
         }
+
+    async def _auto_start_race(self) -> None:
+        """Automatically start race after betting duration."""
+        try:
+            await asyncio.sleep(self.BETTING_DURATION)
+
+            # Only start if still in setup phase
+            if self.state.phase == GamePhase.SETUP:
+                logger.info(
+                    "Betting time expired, starting race",
+                    room_code=self.room_code,
+                )
+                await self._start_race()
+        except asyncio.CancelledError:
+            logger.debug("Race auto-start cancelled", room_code=self.room_code)
 
     async def handle_player_action(
         self, player_id: str, action: str, data: dict[str, Any]
@@ -256,16 +279,28 @@ class HorseRace(BaseGame):
         """
         player_data = self.state.player_data.get(player_id, {})
 
+        horses = self.state.round_data.get("horses", [])
+        logger.info(
+            "Getting state for player",
+            player_id=player_id,
+            phase=self.state.phase.value,
+            horses_count=len(horses),
+            round_data_keys=list(self.state.round_data.keys()),
+        )
+
         state = {
             "phase": self.state.phase.value,
             "your_bet": player_data.get("bet"),
             "your_score": self.state.scores.get(player_id, 0),
-            "horses": self.state.round_data.get("horses", []),
+            "horses": horses,
+            "betting_duration": self.BETTING_DURATION,
         }
 
         if self.state.phase == GamePhase.FINISHED:
             state["winner"] = self.state.round_data.get("winner")
             state["all_scores"] = self.state.scores
+
+        logger.debug(f"Returning state for player: {state}")
 
         return state
 
