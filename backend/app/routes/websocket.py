@@ -12,6 +12,7 @@ from app.database import get_db
 from app.redis_client import get_redis
 from app.schemas.room import PlayerInfo, RoomState
 from app.services import PlayerManager, RoomManager, connection_manager
+from app.services.game_manager import get_game_manager
 
 logger = get_logger()
 
@@ -510,22 +511,73 @@ async def handle_message(
             # Update room status
             room = await room_manager.get_room_by_id(player.room_id)
             if room and room.status == "lobby":
-                room.status = "playing"
-                room.current_game = game_type
-                await db.flush()
+                try:
+                    # Create and start game instance
+                    game_manager = get_game_manager()
+                    game = await game_manager.create_game(db, room_code, game_type)
+                    initial_state = await game_manager.start_game(room_code)
 
-                # Notify room - send game_starting with countdown
-                await connection_manager.broadcast_to_room(
-                    message={
-                        "type": "game_starting",
-                        "data": {"game_type": game_type, "countdown": 3},
-                    },
-                    room_code=room_code,
-                )
-                logger.info(f"Game starting in room {room_code} with type {game_type}")
+                    # Update room status
+                    room.status = "playing"
+                    room.current_game = game_type
+                    await db.commit()
+
+                    # Notify room - send game_started with initial state
+                    await connection_manager.broadcast_to_room(
+                        message={
+                            "type": "game_started",
+                            "data": {
+                                "game_type": game_type,
+                                **initial_state,
+                            },
+                        },
+                        room_code=room_code,
+                    )
+                    logger.info(f"Game {game_type} started in room {room_code}")
+                except Exception as e:
+                    logger.error(f"Failed to start game: {e}")
+                    await connection_manager.send_error(
+                        f"Failed to start game: {str(e)}", connection_id, "GAME_ERROR"
+                    )
         else:
             await connection_manager.send_error(
                 "Only host can start game", connection_id, "FORBIDDEN"
+            )
+
+    # Handle game action (during active game)
+    elif message_type == "game_action":
+        try:
+            game_manager = get_game_manager()
+            action = message.data.get("action")
+            action_data = message.data.get("data", {})
+
+            # Handle player action in game
+            response = await game_manager.handle_player_action(
+                room_code, session_id, action, action_data
+            )
+
+            # Send response to player
+            await connection_manager.send_personal_message(
+                message={
+                    "type": "game_action_response",
+                    "data": response,
+                },
+                connection_id=connection_id,
+            )
+
+            # Broadcast game state update to all players
+            display_state = await game_manager.get_state_for_display(room_code)
+            await connection_manager.broadcast_to_room(
+                message={
+                    "type": "game_state_update",
+                    "data": display_state,
+                },
+                room_code=room_code,
+            )
+        except Exception as e:
+            logger.error(f"Game action error: {e}")
+            await connection_manager.send_error(
+                f"Game action failed: {str(e)}", connection_id, "GAME_ERROR"
             )
 
     # Unknown message type
