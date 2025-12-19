@@ -17,6 +17,8 @@ class LobbyController {
     this.roomCode = null;
     this.playerId = null;
     this.isHost = false;
+    this.selectedGame = null;
+    this.availableGames = [];
     this.init();
   }
 
@@ -53,6 +55,10 @@ class LobbyController {
       // Player info
       playerName: document.getElementById('player-name'),
       hostBadge: document.getElementById('host-badge'),
+
+      // Game selection
+      gameSelectionSection: document.getElementById('game-selection-section'),
+      gamesGrid: document.getElementById('games-grid'),
 
       // Players section
       playerCount: document.getElementById('player-count'),
@@ -247,10 +253,23 @@ class LobbyController {
       this.elements.roomCode.textContent = data.room_code;
       this.elements.playerName.textContent = currentPlayer.name;
 
+      // Check if player became host
+      const wasHost = this.isHost;
+      this.isHost = currentPlayer.is_host;
+
       if (currentPlayer.is_host) {
         this.elements.hostBadge.classList.remove('hidden');
+
+        // Fetch games if just became host
+        if (!wasHost && this.availableGames.length === 0) {
+          this.fetchAvailableGames();
+        } else if (wasHost) {
+          // Re-render game selection if already host
+          this.renderGameSelection();
+        }
       } else {
         this.elements.hostBadge.classList.add('hidden');
+        this.elements.gameSelectionSection?.classList.add('hidden');
       }
     }
   }
@@ -332,11 +351,102 @@ class LobbyController {
     const connectedPlayers = players.filter((p) => p.connected);
     const minPlayers = CONFIG.room.minPlayers;
 
-    if (connectedPlayers.length >= minPlayers) {
+    // Enable if: game selected AND enough players
+    if (this.selectedGame && connectedPlayers.length >= minPlayers) {
       this.elements.startGameBtn.disabled = false;
     } else {
       this.elements.startGameBtn.disabled = true;
     }
+  }
+
+  /**
+   * Fetch available games from API
+   */
+  async fetchAvailableGames() {
+    try {
+      const response = await fetch(`${CONFIG.api.baseUrl}/games`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch games');
+      }
+      const data = await response.json();
+      this.availableGames = data.games || [];
+      logger.info('Available games:', this.availableGames);
+
+      if (this.isHost) {
+        this.renderGameSelection();
+      }
+    } catch (error) {
+      logger.error('Failed to fetch games:', error);
+      notifications.error('Failed to load available games');
+    }
+  }
+
+  /**
+   * Render game selection UI
+   */
+  renderGameSelection() {
+    if (!this.isHost || !this.elements.gamesGrid) return;
+
+    // Show game selection section
+    this.elements.gameSelectionSection?.classList.remove('hidden');
+
+    // Clear existing games
+    this.elements.gamesGrid.innerHTML = '';
+
+    // Game icons map
+    const gameIcons = {
+      horse_race: '🐴',
+      trivia: '🎯',
+      memory: '🧠'
+    };
+
+    // Render each game
+    this.availableGames.forEach((game) => {
+      const gameCard = document.createElement('div');
+      gameCard.className = 'game-card';
+      gameCard.dataset.gameType = game.type;
+
+      const icon = gameIcons[game.type] || '🎮';
+
+      gameCard.innerHTML = `
+        <div class="game-card-icon">${icon}</div>
+        <div class="game-card-name">${game.name}</div>
+        <div class="game-card-players">${game.min_players}-${game.max_players} players</div>
+      `;
+
+      gameCard.addEventListener('click', () => {
+        this.selectGame(game.type);
+      });
+
+      this.elements.gamesGrid.appendChild(gameCard);
+    });
+
+    // Select first game by default if none selected
+    if (!this.selectedGame && this.availableGames.length > 0) {
+      this.selectGame(this.availableGames[0].type);
+    }
+  }
+
+  /**
+   * Select a game
+   */
+  selectGame(gameType) {
+    this.selectedGame = gameType;
+
+    // Update UI
+    const allCards = this.elements.gamesGrid?.querySelectorAll('.game-card');
+    allCards?.forEach((card) => {
+      if (card.dataset.gameType === gameType) {
+        card.classList.add('selected');
+      } else {
+        card.classList.remove('selected');
+      }
+    });
+
+    logger.info('Selected game:', gameType);
+
+    // Update start button state
+    this.updateStartGameButton(appState.get('players') || []);
   }
 
   /**
@@ -348,6 +458,11 @@ class LobbyController {
       return;
     }
 
+    if (!this.selectedGame) {
+      notifications.error('Please select a game first');
+      return;
+    }
+
     const players = appState.get('players') || [];
     const connectedPlayers = players.filter((p) => p.connected);
 
@@ -356,8 +471,8 @@ class LobbyController {
       return;
     }
 
-    // Send start game message
-    this.ws.send('start_game');
+    // Send start game message with game type
+    this.ws.send('start_game', { game_type: this.selectedGame });
     // Note: Don't show notification here - game_starting event will handle it
   }
 
