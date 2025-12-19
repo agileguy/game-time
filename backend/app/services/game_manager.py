@@ -83,6 +83,7 @@ class GameManager:
         """
         self.redis = redis
         self._active_games: dict[str, BaseGame] = {}
+        self._games_needing_broadcast: set[str] = set()
 
     async def create_game(
         self,

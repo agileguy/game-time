@@ -108,17 +108,18 @@ class HorseRace(BaseGame):
         }
 
     async def _auto_start_race(self) -> None:
-        """Automatically start race after betting duration."""
+        """Automatically start and finish race after betting duration."""
         try:
             await asyncio.sleep(self.BETTING_DURATION)
 
             # Only start if still in setup phase
             if self.state.phase == GamePhase.SETUP:
                 logger.info(
-                    "Betting time expired, starting race",
+                    "Betting time expired, running race",
                     room_code=self.room_code,
                 )
-                await self._start_race()
+                # Run race to completion instantly
+                await self._run_instant_race()
         except asyncio.CancelledError:
             logger.debug("Race auto-start cancelled", room_code=self.room_code)
 
@@ -171,6 +172,51 @@ class HorseRace(BaseGame):
             "bet": horse_id,
             "horse_name": self.HORSE_NAMES[horse_id],
         }
+
+    async def _run_instant_race(self) -> None:
+        """Run race to completion instantly without animation."""
+        if self.state.phase != GamePhase.SETUP:
+            return
+
+        self.state.phase = GamePhase.PLAYING
+        self.state.round_data["race_start_time"] = datetime.utcnow().isoformat()
+
+        logger.info("Running instant race", room_code=self.room_code)
+
+        # Randomly determine finishing order
+        horses = self.state.round_data["horses"]
+        finished_order = list(range(self.NUM_HORSES))
+        random.shuffle(finished_order)
+
+        # Set final positions
+        for i, horse in enumerate(horses):
+            horse["position"] = self.TRACK_LENGTH
+
+        # Record results
+        self.state.round_data["winner"] = finished_order[0]
+        self.state.round_data["second_place"] = (
+            finished_order[1] if len(finished_order) > 1 else None
+        )
+        self.state.round_data["race_end_time"] = datetime.utcnow().isoformat()
+
+        # Calculate scores
+        await self._calculate_scores(finished_order)
+
+        # Move to finished phase
+        self.state.phase = GamePhase.FINISHED
+        self.state.finished_at = datetime.utcnow()
+        self.state.winner_id = self._calculate_winner()
+
+        # Mark that game needs broadcast
+        if hasattr(self, '_on_state_changed'):
+            await self._on_state_changed()
+
+        logger.info(
+            "Instant race finished",
+            room_code=self.room_code,
+            winner_horse=finished_order[0],
+            winner_player=self.state.winner_id,
+        )
 
     async def _start_race(self) -> dict[str, Any]:
         """Start the race simulation."""
