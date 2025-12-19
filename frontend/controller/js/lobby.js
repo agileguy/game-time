@@ -123,13 +123,6 @@ class LobbyController {
       this.isHost = isHost;
       this.updateHostControls();
     });
-
-    // Subscribe to room status changes
-    appState.subscribe('roomStatus', (status) => {
-      if (status === 'playing') {
-        this.handleGameStarted();
-      }
-    });
   }
 
   /**
@@ -203,6 +196,12 @@ class LobbyController {
       } else {
         notifications.info(`${data.new_host_name} is now the host`);
       }
+    });
+
+    // Game starting (countdown)
+    this.ws.on('game_starting', (data) => {
+      logger.info('Game starting:', data);
+      notifications.success('Starting game...');
     });
 
     // Game started

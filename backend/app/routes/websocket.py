@@ -532,6 +532,22 @@ async def handle_message(
             room = await room_manager.get_room_by_id(player.room_id)
             if room and room.status == "lobby":
                 try:
+                    # Send game_starting countdown
+                    await connection_manager.broadcast_to_room(
+                        message={
+                            "type": "game_starting",
+                            "data": {
+                                "game_type": game_type,
+                                "countdown": 3,
+                            },
+                        },
+                        room_code=room_code,
+                    )
+                    logger.info(f"Game {game_type} starting countdown in room {room_code}")
+
+                    # Wait for countdown
+                    await asyncio.sleep(3)
+
                     # Ensure all pending transactions are committed before creating game
                     # This is critical to ensure create_game sees all players that have joined
                     await db.commit()
