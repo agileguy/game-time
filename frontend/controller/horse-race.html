@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <title>Game Time - Horse Race</title>
+
+  <!-- Shared CSS -->
+  <link rel="stylesheet" href="../shared/css/reset.css">
+  <link rel="stylesheet" href="../shared/css/variables.css">
+  <link rel="stylesheet" href="../shared/css/typography.css">
+  <link rel="stylesheet" href="../shared/css/utilities.css">
+
+  <!-- Controller CSS -->
+  <link rel="stylesheet" href="css/horse-race.css">
+</head>
+<body class="controller-view">
+  <div class="race-controller-container full-height">
+    <!-- Header -->
+    <header class="race-header">
+      <div class="header-content">
+        <div class="player-info">
+          <div class="text-xs text-secondary">Your Score</div>
+          <div id="player-score" class="player-score">0</div>
+        </div>
+        <div class="phase-indicator">
+          <span id="phase-text" class="phase-text">Betting</span>
+          <span id="phase-timer" class="phase-timer">15s</span>
+        </div>
+        <div class="connection-status">
+          <span id="connection-indicator" class="connection-dot connected"></span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="race-main">
+      <!-- Betting Phase -->
+      <section id="betting-phase" class="betting-phase">
+        <div class="betting-instructions">
+          <div class="instruction-icon">🎰</div>
+          <h2 class="instruction-title">Place Your Bet!</h2>
+          <p class="instruction-text">Choose a horse to bet on</p>
+        </div>
+
+        <div id="current-bet" class="current-bet hidden">
+          <div class="bet-label">Your Bet</div>
+          <div id="bet-horse-name" class="bet-horse-name">---</div>
+          <button id="change-bet-btn" class="btn btn-secondary btn-sm">Change Bet</button>
+        </div>
+
+        <div id="horse-selection" class="horse-selection">
+          <!-- Horse betting cards will be inserted here -->
+        </div>
+      </section>
+
+      <!-- Racing Phase -->
+      <section id="racing-phase" class="racing-phase hidden">
+        <div class="racing-status">
+          <div class="status-icon">🏁</div>
+          <h2 class="status-title">Race in Progress!</h2>
+          <div id="your-bet-reminder" class="your-bet-reminder">
+            You bet on: <span id="bet-reminder-horse" class="bet-horse-highlight">---</span>
+          </div>
+        </div>
+
+        <div id="race-positions" class="race-positions">
+          <!-- Horse position bars will be inserted here -->
+        </div>
+      </section>
+
+      <!-- Results Phase -->
+      <section id="results-phase" class="results-phase hidden">
+        <div class="results-header">
+          <div id="win-status-icon" class="win-status-icon">🏆</div>
+          <h2 id="win-status-text" class="win-status-text">---</h2>
+          <div id="points-earned" class="points-earned">+0 points</div>
+        </div>
+
+        <div id="race-results" class="race-results">
+          <div class="results-title">Final Positions</div>
+          <div id="results-list" class="results-list">
+            <!-- Results will be inserted here -->
+          </div>
+        </div>
+
+        <div id="score-summary" class="score-summary">
+          <div class="summary-row">
+            <span class="summary-label">Your Score</span>
+            <span id="final-score" class="summary-value">0</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Waiting Phase -->
+      <section id="waiting-phase" class="waiting-phase hidden">
+        <div class="waiting-content">
+          <div class="waiting-icon">⏳</div>
+          <h2 class="waiting-title">Get Ready!</h2>
+          <p class="waiting-text">Next round starting soon...</p>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="race-footer">
+      <div class="footer-content">
+        <div class="room-info">
+          <span class="text-secondary text-xs">Room:</span>
+          <span id="room-code" class="text-primary text-sm font-mono">----</span>
+        </div>
+        <div class="round-info">
+          <span id="round-display" class="text-secondary text-xs">Round 1 of 1</span>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Scripts -->
+  <script type="module" src="js/horse-race.js"></script>
+</body>
+</html>

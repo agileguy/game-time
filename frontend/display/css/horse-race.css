@@ -1,0 +1,562 @@
+/**
+ * Horse Race Display Styles
+ * 8-bit retro theme optimized for TV/projector screens
+ */
+
+.race-container {
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-6);
+  background: linear-gradient(135deg, #000000 0%, #1a0a00 100%);
+}
+
+.race-header {
+  border-bottom: var(--border-width) solid var(--color-primary);
+  padding-bottom: var(--space-4);
+  margin-bottom: var(--space-6);
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.game-title {
+  font-size: var(--font-size-display-lg);
+  color: var(--color-primary);
+  text-shadow: 6px 6px 0 rgba(255, 107, 0, 0.4);
+  letter-spacing: 0.1em;
+}
+
+.phase-indicator {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  background: var(--color-bg-secondary);
+  border: var(--border-width) solid var(--color-secondary);
+  padding: var(--space-3) var(--space-6);
+}
+
+.phase-text {
+  font-size: var(--font-size-display-xs);
+  color: var(--color-secondary);
+  letter-spacing: 0.1em;
+}
+
+.phase-timer {
+  font-size: var(--font-size-display-sm);
+  color: var(--color-primary);
+  font-weight: 700;
+  min-width: 60px;
+  text-align: center;
+}
+
+.connection-status {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.connection-dot {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+
+.connection-dot.connected {
+  background-color: var(--color-success);
+  box-shadow: 0 0 20px var(--color-success);
+}
+
+.connection-dot.disconnected {
+  background-color: var(--color-error);
+  box-shadow: 0 0 20px var(--color-error);
+}
+
+.connection-dot.connecting {
+  background-color: var(--color-warning);
+  box-shadow: 0 0 20px var(--color-warning);
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(1.1);
+  }
+}
+
+.race-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  overflow: hidden;
+}
+
+/* Betting Phase */
+.betting-phase {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-8);
+  padding: var(--space-8);
+}
+
+.betting-message {
+  text-align: center;
+  margin-bottom: var(--space-8);
+}
+
+.betting-icon {
+  font-size: 8rem;
+  margin-bottom: var(--space-4);
+  animation: spin 3s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.betting-text {
+  font-size: var(--font-size-display-md);
+  color: var(--color-primary);
+  text-shadow: 4px 4px 0 rgba(255, 107, 0, 0.3);
+  letter-spacing: 0.15em;
+  margin-bottom: var(--space-4);
+}
+
+.betting-countdown {
+  font-size: var(--font-size-display-xl);
+  color: var(--color-secondary);
+  text-shadow: 4px 4px 0 rgba(0, 255, 0, 0.3);
+  animation: countdownPulse 1s ease-in-out infinite;
+}
+
+@keyframes countdownPulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+.horse-preview {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-6);
+  width: 100%;
+  max-width: 1400px;
+}
+
+.horse-preview-card {
+  background: var(--color-bg-secondary);
+  border: var(--border-width) solid var(--color-gray-400);
+  padding: var(--space-6);
+  text-align: center;
+  transition: all 0.2s ease;
+}
+
+.horse-preview-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+}
+
+.horse-preview-icon {
+  font-size: 5rem;
+  margin-bottom: var(--space-4);
+}
+
+.horse-preview-name {
+  font-size: var(--font-size-display-xs);
+  font-weight: 700;
+  margin-bottom: var(--space-2);
+  letter-spacing: 0.1em;
+}
+
+.horse-preview-odds {
+  font-size: var(--font-size-base);
+  color: var(--color-text-secondary);
+}
+
+/* Race Track */
+.race-track {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  padding: var(--space-8) var(--space-4);
+}
+
+.track-lanes {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  height: 100%;
+  position: relative;
+}
+
+.horse-lane {
+  position: relative;
+  height: 100px;
+  background: repeating-linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.05),
+    rgba(255, 255, 255, 0.05) 40px,
+    transparent 40px,
+    transparent 80px
+  );
+  border: var(--border-width) solid var(--color-gray-400);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.horse-lane:nth-child(odd) {
+  background-color: rgba(255, 255, 255, 0.02);
+}
+
+.lane-marker {
+  position: absolute;
+  left: var(--space-2);
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  z-index: 1;
+}
+
+.lane-number {
+  font-size: var(--font-size-lg);
+  color: var(--color-text-secondary);
+  font-weight: 700;
+  min-width: 30px;
+}
+
+.lane-horse-name {
+  font-size: var(--font-size-md);
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+.horse-sprite {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 4rem;
+  transition: left 0.1s linear;
+  filter: drop-shadow(4px 4px 4px rgba(0, 0, 0, 0.5));
+  animation: gallop 0.3s steps(2) infinite;
+}
+
+@keyframes gallop {
+  0%, 100% {
+    transform: translateY(-50%) scaleY(1);
+  }
+  50% {
+    transform: translateY(-50%) scaleY(0.95);
+  }
+}
+
+.finish-line {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 40px;
+  background: repeating-linear-gradient(
+    45deg,
+    #ffffff,
+    #ffffff 10px,
+    #000000 10px,
+    #000000 20px
+  );
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+}
+
+.finish-flag {
+  font-size: 3rem;
+  animation: wave 1s ease-in-out infinite;
+}
+
+@keyframes wave {
+  0%, 100% {
+    transform: rotate(-5deg);
+  }
+  50% {
+    transform: rotate(5deg);
+  }
+}
+
+/* Results Phase */
+.results-phase {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--space-8);
+  gap: var(--space-8);
+}
+
+.results-header {
+  text-align: center;
+  margin-bottom: var(--space-6);
+}
+
+.results-title {
+  font-size: var(--font-size-display-lg);
+  color: var(--color-primary);
+  text-shadow: 6px 6px 0 rgba(255, 107, 0, 0.4);
+  letter-spacing: 0.15em;
+  animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.results-podium {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: var(--space-6);
+  margin-bottom: var(--space-8);
+}
+
+.podium-place {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+  animation: slideUp 0.5s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.podium-place:nth-child(1) {
+  animation-delay: 0.2s;
+}
+
+.podium-place:nth-child(2) {
+  animation-delay: 0s;
+}
+
+.podium-place:nth-child(3) {
+  animation-delay: 0.1s;
+}
+
+.podium-horse {
+  font-size: 6rem;
+  margin-bottom: var(--space-2);
+}
+
+.podium-place-1 .podium-horse {
+  animation: bounce 1s ease-in-out infinite;
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+.podium-rank {
+  font-size: var(--font-size-display-md);
+  font-weight: 700;
+  margin-bottom: var(--space-2);
+}
+
+.podium-place-1 .podium-rank {
+  color: #FFD700;
+  text-shadow: 3px 3px 0 rgba(255, 215, 0, 0.4);
+}
+
+.podium-place-2 .podium-rank {
+  color: #C0C0C0;
+  text-shadow: 3px 3px 0 rgba(192, 192, 192, 0.4);
+}
+
+.podium-place-3 .podium-rank {
+  color: #CD7F32;
+  text-shadow: 3px 3px 0 rgba(205, 127, 50, 0.4);
+}
+
+.podium-horse-name {
+  font-size: var(--font-size-display-xs);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+}
+
+.podium-pedestal {
+  background: var(--color-bg-secondary);
+  border: var(--border-width) solid var(--color-primary);
+  padding: var(--space-4) var(--space-8);
+  margin-top: var(--space-4);
+}
+
+.podium-place-1 .podium-pedestal {
+  height: 150px;
+  border-color: #FFD700;
+}
+
+.podium-place-2 .podium-pedestal {
+  height: 100px;
+  border-color: #C0C0C0;
+}
+
+.podium-place-3 .podium-pedestal {
+  height: 80px;
+  border-color: #CD7F32;
+}
+
+/* Player Standings */
+.player-standings {
+  width: 100%;
+  max-width: 800px;
+}
+
+.standings-header {
+  font-size: var(--font-size-display-sm);
+  color: var(--color-secondary);
+  letter-spacing: 0.1em;
+  padding-bottom: var(--space-4);
+  border-bottom: var(--border-width) solid var(--color-primary);
+  margin-bottom: var(--space-4);
+  text-align: center;
+}
+
+.standings-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.standing-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--color-bg-secondary);
+  border: var(--border-width) solid var(--color-gray-400);
+  padding: var(--space-4) var(--space-6);
+  animation: fadeIn 0.3s ease-in;
+}
+
+.standing-item:nth-child(1) {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 20px rgba(255, 107, 0, 0.3);
+}
+
+.standing-rank {
+  font-size: var(--font-size-xl);
+  font-weight: 700;
+  color: var(--color-primary);
+  min-width: 50px;
+}
+
+.standing-name {
+  flex: 1;
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+}
+
+.standing-score {
+  font-size: var(--font-size-xl);
+  font-weight: 700;
+  color: var(--color-secondary);
+}
+
+.standing-change {
+  font-size: var(--font-size-md);
+  margin-left: var(--space-2);
+  color: var(--color-success);
+}
+
+/* Footer */
+.race-footer {
+  border-top: var(--border-width) solid var(--color-primary);
+  padding-top: var(--space-4);
+  margin-top: var(--space-6);
+}
+
+.footer-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: var(--font-size-base);
+}
+
+.room-info,
+.round-info {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+/* Responsive adjustments */
+@media (max-width: 1280px) {
+  .horse-preview {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .race-track {
+    padding: var(--space-4);
+  }
+
+  .horse-lane {
+    height: 80px;
+  }
+
+  .horse-sprite {
+    font-size: 3rem;
+  }
+}
+
+@media (max-height: 720px) {
+  .horse-lane {
+    height: 60px;
+  }
+
+  .horse-sprite {
+    font-size: 2.5rem;
+  }
+
+  .betting-icon {
+    font-size: 5rem;
+  }
+
+  .podium-horse {
+    font-size: 4rem;
+  }
+}
