@@ -508,6 +508,12 @@ class HorseRaceController {
     this.elements.racingPhase.classList.add('hidden');
     this.elements.waitingPhase.classList.add('hidden');
 
+    // Clear betting timer if still running
+    if (this.bettingTimer) {
+      clearInterval(this.bettingTimer);
+      this.bettingTimer = null;
+    }
+
     // Show results phase
     this.elements.resultsPhase.classList.remove('hidden');
 

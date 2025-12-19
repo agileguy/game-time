@@ -50,15 +50,35 @@ async def broadcast_game_states():
                 # Get all active games
                 for room_code in list(game_manager._active_games.keys()):
                     try:
-                        # Get display state and broadcast to room
-                        display_state = await game_manager.get_state_for_display(room_code)
-                        await connection_manager.broadcast_to_room(
-                            message={
-                                "type": "game_state_update",
-                                "data": display_state,
-                            },
-                            room_code=room_code,
-                        )
+                        # Get all connection IDs for this room
+                        connection_ids = connection_manager.room_connections.get(room_code, [])
+
+                        for connection_id in connection_ids:
+                            try:
+                                # Find session_id for this connection_id (reverse lookup)
+                                session_id = None
+                                for sid, cid in connection_manager.session_connections.items():
+                                    if cid == connection_id:
+                                        session_id = sid
+                                        break
+
+                                if not session_id:
+                                    continue
+
+                                # Get player-specific state
+                                player_state = await game_manager.get_state_for_player(room_code, session_id)
+
+                                # Send to this specific player
+                                await connection_manager.send_personal_message(
+                                    message={
+                                        "type": "game_state_update",
+                                        "data": player_state,
+                                    },
+                                    connection_id=connection_id,
+                                )
+                            except Exception as e:
+                                logger.debug(f"Error broadcasting to {connection_id}: {e}")
+
                     except Exception as e:
                         logger.debug(f"Error broadcasting state for room {room_code}: {e}")
 

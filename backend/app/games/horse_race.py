@@ -188,7 +188,15 @@ class HorseRace(BaseGame):
         finished_order = list(range(self.NUM_HORSES))
         random.shuffle(finished_order)
 
-        # Set final positions
+        # Initially set all horses to starting position
+        for horse in horses:
+            horse["position"] = 0
+
+        # Wait a moment to let clients see the PLAYING phase and race animation
+        # This needs to be long enough for tests to observe the racing phase
+        await asyncio.sleep(5)
+
+        # Now set final positions
         for i, horse in enumerate(horses):
             horse["position"] = self.TRACK_LENGTH
 
@@ -206,10 +214,6 @@ class HorseRace(BaseGame):
         self.state.phase = GamePhase.FINISHED
         self.state.finished_at = datetime.utcnow()
         self.state.winner_id = self._calculate_winner()
-
-        # Mark that game needs broadcast
-        if hasattr(self, '_on_state_changed'):
-            await self._on_state_changed()
 
         logger.info(
             "Instant race finished",
