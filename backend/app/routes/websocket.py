@@ -512,6 +512,10 @@ async def handle_message(
             room = await room_manager.get_room_by_id(player.room_id)
             if room and room.status == "lobby":
                 try:
+                    # Ensure all pending transactions are committed before creating game
+                    # This is critical to ensure create_game sees all players that have joined
+                    await db.commit()
+
                     # Create and start game instance
                     game_manager = get_game_manager()
                     game = await game_manager.create_game(db, room_code, game_type)

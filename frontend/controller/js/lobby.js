@@ -205,10 +205,10 @@ class LobbyController {
       }
     });
 
-    // Game starting (with countdown)
-    this.ws.on('game_starting', (data) => {
-      logger.info('Game starting:', data);
-      this.handleGameStarted();
+    // Game started
+    this.ws.on('game_started', (data) => {
+      logger.info('Game started:', data);
+      this.handleGameStarted(data.game_type);
     });
 
     // Error messages
@@ -539,14 +539,16 @@ class LobbyController {
 
   /**
    * Handle game started
+   * @param {string} gameType - Type of game (e.g., 'horse_race')
    */
-  handleGameStarted() {
+  handleGameStarted(gameType) {
     notifications.success('Starting game...');
 
     // Redirect to game view
     setTimeout(() => {
-      // TODO: Redirect to appropriate game view
-      notifications.info('Game views not yet implemented');
+      // Convert game_type to filename (e.g., 'horse_race' -> 'horse-race.html')
+      const gameFileName = gameType.replace(/_/g, '-');
+      window.location.href = `${gameFileName}.html`;
     }, 1500);
   }
 }

@@ -6,6 +6,7 @@ from typing import Any
 import redis.asyncio as aioredis
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from app.core.exceptions import GameStateError, RoomNotFoundError
 from app.core.logging import get_logger
@@ -104,9 +105,13 @@ class GameManager:
             RoomNotFoundError: If room doesn't exist
             GameStateError: If game type is invalid or game already active
         """
-        # Get the room
+        # Expire all cached objects to ensure fresh data from database
+        # This is critical for transaction isolation - we need to see all committed player joins
+        db.expire_all()
+
+        # Get the room with players
         room_result = await db.execute(
-            select(Room).filter(Room.code == room_code).options()
+            select(Room).filter(Room.code == room_code).options(selectinload(Room.players))
         )
         room = room_result.scalar_one_or_none()
 
@@ -130,6 +135,7 @@ class GameManager:
 
         # Validate player count
         player_count = len(room.players)
+        logger.info(f"Room {room_code} has {player_count} players: {[p.name for p in room.players]}")
         if player_count < game_class.min_players():
             raise GameStateError(
                 f"Not enough players. Need at least {game_class.min_players()}",
@@ -157,6 +163,9 @@ class GameManager:
             started_at=datetime.utcnow(),
         )
         db.add(game_session)
+
+        # Flush to get the game_session.id before creating scores
+        await db.flush()
 
         # Create score records for each player
         for player in room.players:

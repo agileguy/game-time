@@ -167,7 +167,7 @@ class DisplayLobbyController {
     // Game started
     this.ws.on('game_started', (data) => {
       logger.info('Game started:', data);
-      this.handleGameStarted();
+      this.handleGameStarted(data.game_type);
     });
 
     // Error messages
@@ -370,8 +370,9 @@ class DisplayLobbyController {
 
   /**
    * Handle game started
+   * @param {string} gameType - Type of game (e.g., 'horse_race')
    */
-  handleGameStarted() {
+  handleGameStarted(gameType) {
     // Hide countdown
     if (this.countdownTimer) {
       clearInterval(this.countdownTimer);
@@ -381,9 +382,11 @@ class DisplayLobbyController {
     this.elements.startCountdown.classList.add('hidden');
     this.showStatusMessage('Game Started!', 2000);
 
-    // TODO: Transition to game view
+    // Redirect to game view
     setTimeout(() => {
-      logger.info('Game views not yet implemented');
+      // Convert game_type to filename (e.g., 'horse_race' -> 'horse-race.html')
+      const gameFileName = gameType.replace(/_/g, '-');
+      window.location.href = `${gameFileName}.html`;
     }, 2000);
   }
 

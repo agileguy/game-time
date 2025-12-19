@@ -54,25 +54,22 @@ test.describe('Horse Race Game', () => {
 
       await player2JoinPage.joinRoom(roomCode, testPlayers.player2.name);
 
-      // Create display player to get session
-      const displaySetupContext = await browser.newContext();
-      const displaySetupPage = await displaySetupContext.newPage();
-      const displayJoinPage = new ControllerJoinPage(displaySetupPage);
-
-      await displayJoinPage.joinRoom(roomCode, 'Display');
-
-      const displaySessionId = await displaySetupPage.evaluate(() => {
-        return localStorage.getItem('gametime_session');
-      });
-
-      await displaySetupContext.close();
-
-      // Create display
+      // Create display - join as controller first, then switch to display view
       displayContext = await browser.newContext();
       const displayBrowserPage = await displayContext.newPage();
+      const displayJoinPage = new ControllerJoinPage(displayBrowserPage);
       displayLobby = new DisplayLobbyPage(displayBrowserPage);
       displayGame = new DisplayHorseRacePage(displayBrowserPage);
 
+      // Join room as controller to create player/session
+      await displayJoinPage.joinRoom(roomCode, 'Display');
+
+      // Extract session ID and room code
+      const displaySessionId = await displayBrowserPage.evaluate(() => {
+        return localStorage.getItem('gametime_session');
+      });
+
+      // Navigate to display lobby view and restore session
       await displayLobby.goto();
       await displayLobby.page.evaluate(
         ({ sessionId, code }) => {
@@ -81,7 +78,6 @@ test.describe('Horse Race Game', () => {
         },
         { sessionId: displaySessionId, code: roomCode }
       );
-
       await displayLobby.page.reload();
       await displayLobby.page.waitForLoadState('networkidle');
 
