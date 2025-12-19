@@ -230,6 +230,13 @@ class LobbyController {
   handleRoomState(data) {
     logger.debug('Updating room state:', data);
 
+    // Find current player
+    const currentPlayer = data.players?.find((p) => p.session_id === this.sessionId);
+
+    // Capture host status BEFORE state updates trigger subscriptions
+    const wasHost = this.isHost;
+    const isNowHost = currentPlayer?.is_host || false;
+
     // Update state
     appState.update({
       roomCode: data.room_code,
@@ -237,9 +244,6 @@ class LobbyController {
       players: data.players || [],
       maxPlayers: data.max_players || 12,
     });
-
-    // Find current player
-    const currentPlayer = data.players?.find((p) => p.session_id === this.sessionId);
 
     if (currentPlayer) {
       this.playerId = currentPlayer.id;
@@ -253,19 +257,24 @@ class LobbyController {
       this.elements.roomCode.textContent = data.room_code;
       this.elements.playerName.textContent = currentPlayer.name;
 
-      // Check if player became host
-      const wasHost = this.isHost;
-      this.isHost = currentPlayer.is_host;
+      // Use the captured values
+      this.isHost = isNowHost;
+
+      logger.info('Host check:', { wasHost, isHost: this.isHost, availableGamesCount: this.availableGames.length });
 
       if (currentPlayer.is_host) {
         this.elements.hostBadge.classList.remove('hidden');
 
         // Fetch games if just became host
         if (!wasHost && this.availableGames.length === 0) {
+          logger.info('Fetching available games...');
           this.fetchAvailableGames();
         } else if (wasHost) {
           // Re-render game selection if already host
+          logger.info('Re-rendering game selection');
           this.renderGameSelection();
+        } else {
+          logger.warn('Not fetching games - wasHost:', wasHost, 'availableGames:', this.availableGames.length);
         }
       } else {
         this.elements.hostBadge.classList.add('hidden');
@@ -364,7 +373,9 @@ class LobbyController {
    */
   async fetchAvailableGames() {
     try {
-      const response = await fetch(`${CONFIG.api.baseUrl}/games`);
+      const url = `${CONFIG.api.baseUrl}/api/games`;
+      logger.info('Fetching games from:', url);
+      const response = await fetch(url);
       if (!response.ok) {
         throw new Error('Failed to fetch games');
       }
