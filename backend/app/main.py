@@ -1,5 +1,6 @@
 """Main FastAPI application entry point."""
 
+import asyncio
 from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 
@@ -8,6 +9,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from app.config import settings
+from app.core.logging import get_logger
 from app.database import close_db, init_db
 from app.games.horse_race import HorseRace
 from app.redis_client import redis_client
@@ -17,6 +19,56 @@ from app.services.game_manager import GameManager, GameRegistry
 # Import to register game manager
 import app.services.game_manager as game_manager_module
 
+logger = get_logger()
+
+# Global task for game state broadcaster
+_broadcaster_task: asyncio.Task | None = None
+
+
+async def broadcast_game_states():
+    """Periodically broadcast game state updates for active games."""
+    from app.services.game_manager import get_game_manager
+
+    # Wait a bit for everything to initialize
+    await asyncio.sleep(2)
+
+    logger.info("Game state broadcaster started")
+
+    try:
+        while True:
+            await asyncio.sleep(1)  # Broadcast every second
+
+            try:
+                # Import here to avoid issues with initialization order
+                from app.services.websocket_manager import connection_manager
+
+                if connection_manager is None:
+                    continue
+
+                game_manager = get_game_manager()
+
+                # Get all active games
+                for room_code in list(game_manager._active_games.keys()):
+                    try:
+                        # Get display state and broadcast to room
+                        display_state = await game_manager.get_state_for_display(room_code)
+                        await connection_manager.broadcast_to_room(
+                            message={
+                                "type": "game_state_update",
+                                "data": display_state,
+                            },
+                            room_code=room_code,
+                        )
+                    except Exception as e:
+                        logger.debug(f"Error broadcasting state for room {room_code}: {e}")
+
+            except Exception as e:
+                logger.error(f"Error in game state broadcaster: {e}", exc_info=True)
+
+    except asyncio.CancelledError:
+        logger.info("Game state broadcaster stopped")
+        raise
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
@@ -25,6 +77,8 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
 
     Handles startup and shutdown events.
     """
+    global _broadcaster_task
+
     # Startup
     await init_db()
     await redis_client.connect()
@@ -35,9 +89,20 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     # Register games
     GameRegistry.register(HorseRace)
 
+    # Start game state broadcaster
+    _broadcaster_task = asyncio.create_task(broadcast_game_states())
+    logger.info(f"Created broadcaster task: {_broadcaster_task}")
+
     yield
 
     # Shutdown
+    if _broadcaster_task:
+        _broadcaster_task.cancel()
+        try:
+            await _broadcaster_task
+        except asyncio.CancelledError:
+            pass
+
     await close_db()
     await redis_client.disconnect()
 
