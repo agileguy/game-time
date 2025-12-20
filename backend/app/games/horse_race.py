@@ -221,9 +221,24 @@ class HorseRace(BaseGame):
         for i, horse in enumerate(horses):
             if i not in finished_order:
                 finished_order.append(i)
+                logger.info(
+                    "Horse added to finish order (cleanup)",
+                    room_code=self.room_code,
+                    horse_id=i,
+                    horse_name=horse["name"],
+                    position_in_race=len(finished_order),
+                )
             horse["position"] = self.TRACK_LENGTH
 
         # Record results based on actual finish order
+        logger.info(
+            "Final finish order",
+            room_code=self.room_code,
+            finished_order=finished_order,
+            winner=finished_order[0] if finished_order else None,
+            second=finished_order[1] if len(finished_order) > 1 else None,
+        )
+
         self.state.round_data["winner"] = finished_order[0]
         self.state.round_data["second_place"] = (
             finished_order[1] if len(finished_order) > 1 else None
