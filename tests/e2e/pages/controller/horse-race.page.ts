@@ -109,6 +109,9 @@ export class ControllerHorseRacePage {
   }
 
   async getAvailableHorses(): Promise<string[]> {
+    // Wait for at least one horse card to be rendered
+    await this.page.waitForSelector('.horse-bet-card', { state: 'visible', timeout: 10000 });
+
     const horseCards = await this.horseSelection.locator('.horse-bet-card').all();
     const horses: string[] = [];
 
@@ -121,6 +124,9 @@ export class ControllerHorseRacePage {
   }
 
   async placeBet(horseIndex: number) {
+    // Wait for horse cards to be rendered
+    await this.page.waitForSelector('.horse-bet-card', { state: 'visible', timeout: 10000 });
+
     const horseCards = await this.horseSelection.locator('.horse-bet-card').all();
     if (horseIndex < 0 || horseIndex >= horseCards.length) {
       throw new Error(`Invalid horse index: ${horseIndex}`);
