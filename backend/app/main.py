@@ -26,6 +26,8 @@ _broadcaster_task: asyncio.Task | None = None
 
 async def broadcast_game_states():
     """Periodically broadcast game state updates for active games."""
+    from app.database import AsyncSessionLocal
+    from app.games.base import GamePhase
     from app.services.game_manager import get_game_manager
 
     # Wait a bit for everything to initialize
@@ -45,6 +47,18 @@ async def broadcast_game_states():
                     continue
 
                 game_manager = get_game_manager()
+
+                # Check for finished games and persist results
+                for room_code in list(game_manager._active_games.keys()):
+                    game = game_manager._active_games.get(room_code)
+                    if game and game.state.phase == GamePhase.FINISHED:
+                        try:
+                            async with AsyncSessionLocal() as db:
+                                logger.info(f"Finishing game in room {room_code}")
+                                await game_manager.finish_game(db, room_code)
+                                await db.commit()
+                        except Exception as e:
+                            logger.error(f"Error finishing game in room {room_code}: {e}", exc_info=True)
 
                 # Get all active games
                 for room_code in list(game_manager._active_games.keys()):

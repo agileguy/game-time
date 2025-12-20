@@ -181,10 +181,9 @@ class HorseRace(BaseGame):
 
         logger.info("Running instant race", room_code=self.room_code)
 
-        # Randomly determine finishing order
+        # Get horses and track finish order
         horses = self.state.round_data["horses"]
-        finished_order = list(range(self.NUM_HORSES))
-        random.shuffle(finished_order)
+        finished_order: list[int] = []
 
         # Initially set all horses to starting position
         for horse in horses:
@@ -197,17 +196,34 @@ class HorseRace(BaseGame):
             await asyncio.sleep(0.2)  # 200ms between updates
 
             # Move each horse forward by a random amount
-            for _i, horse in enumerate(horses):
+            for i, horse in enumerate(horses):
+                # Skip horses that already finished
+                if i in finished_order:
+                    continue
+
                 if horse["position"] < self.TRACK_LENGTH:
                     # Random progress (3-5% of track per update)
                     movement = random.uniform(3.0, 5.0)  # nosec B311 - game animation, not cryptographic
                     horse["position"] = min(self.TRACK_LENGTH, horse["position"] + movement)
 
-        # Ensure all horses have finished
-        for _i, horse in enumerate(horses):
+                    # Check if horse just finished
+                    if horse["position"] >= self.TRACK_LENGTH and i not in finished_order:
+                        finished_order.append(i)
+                        logger.info(
+                            "Horse finished",
+                            room_code=self.room_code,
+                            horse_id=i,
+                            horse_name=horse["name"],
+                            position_in_race=len(finished_order),
+                        )
+
+        # Ensure all horses have finished (in case any didn't cross due to rounding)
+        for i, horse in enumerate(horses):
+            if i not in finished_order:
+                finished_order.append(i)
             horse["position"] = self.TRACK_LENGTH
 
-        # Record results
+        # Record results based on actual finish order
         self.state.round_data["winner"] = finished_order[0]
         self.state.round_data["second_place"] = (
             finished_order[1] if len(finished_order) > 1 else None

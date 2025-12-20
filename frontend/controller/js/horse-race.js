@@ -549,8 +549,8 @@ class HorseRaceController {
       this.elements.winStatusIcon.textContent = '😔';
       this.elements.winStatusText.textContent = 'Better Luck Next Time';
       this.elements.winStatusText.className = 'win-status-text lost';
-      this.elements.pointsEarned.textContent = '+0 points';
-      this.elements.pointsEarned.className = 'points-earned';
+      this.elements.pointsEarned.textContent = `+${pointsEarned} points`;
+      this.elements.pointsEarned.className = pointsEarned > 0 ? 'points-earned positive' : 'points-earned';
     }
 
     // Render results list
