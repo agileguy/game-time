@@ -291,8 +291,11 @@ class HorseRaceController {
     // Show betting phase
     this.elements.bettingPhase.classList.remove('hidden');
 
-    // Render horse selection
-    this.renderHorseSelection(data.horses || []);
+    // Only render horses if we have valid horse data
+    // Don't clear existing horses if update has no horse data
+    if (data.horses && data.horses.length > 0) {
+      this.renderHorseSelection(data.horses);
+    }
 
     // Start countdown
     const bettingDuration = data.betting_duration || 15;

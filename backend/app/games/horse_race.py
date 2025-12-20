@@ -192,11 +192,20 @@ class HorseRace(BaseGame):
         for horse in horses:
             horse["position"] = 0
 
-        # Wait a moment to let clients see the PLAYING phase and race animation
-        # This needs to be long enough for tests to observe the racing phase
-        await asyncio.sleep(5)
+        # Simulate race animation by gradually moving horses
+        # Update positions every 200ms for 5 seconds (25 updates total)
+        updates = 25
+        for update_num in range(updates):
+            await asyncio.sleep(0.2)  # 200ms between updates
 
-        # Now set final positions
+            # Move each horse forward by a random amount
+            for i, horse in enumerate(horses):
+                if horse["position"] < self.TRACK_LENGTH:
+                    # Random progress (3-5% of track per update)
+                    movement = random.uniform(3.0, 5.0)
+                    horse["position"] = min(self.TRACK_LENGTH, horse["position"] + movement)
+
+        # Ensure all horses have finished
         for i, horse in enumerate(horses):
             horse["position"] = self.TRACK_LENGTH
 
