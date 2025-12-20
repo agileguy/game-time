@@ -200,7 +200,7 @@ class HorseRace(BaseGame):
             for _i, horse in enumerate(horses):
                 if horse["position"] < self.TRACK_LENGTH:
                     # Random progress (3-5% of track per update)
-                    movement = random.uniform(3.0, 5.0)
+                    movement = random.uniform(3.0, 5.0)  # nosec B311 - game animation, not cryptographic
                     horse["position"] = min(self.TRACK_LENGTH, horse["position"] + movement)
 
         # Ensure all horses have finished
@@ -257,7 +257,7 @@ class HorseRace(BaseGame):
                     continue
 
                 # Random movement (2-8 units per update)
-                movement = random.uniform(2.0, 8.0)
+                movement = random.uniform(2.0, 8.0)  # nosec B311 - game animation, not cryptographic
                 horse["position"] = min(self.TRACK_LENGTH, horse["position"] + movement)
 
                 # Check if horse finished
