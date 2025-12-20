@@ -87,7 +87,10 @@ export class ControllerJoinPage {
   async joinRoom(roomCode: string, playerName: string) {
     await this.goto();
     await this.joinWithRoomCode(roomCode);
-    await this.page.waitForTimeout(500); // Wait for transition
+
+    // Wait for player name input to become visible (after API validation completes)
+    await this.playerNameInput.waitFor({ state: 'visible', timeout: 10000 });
+
     await this.enterPlayerName(playerName);
     await this.clickJoin();
     await this.page.waitForURL('**/lobby.html');
