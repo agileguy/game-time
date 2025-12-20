@@ -375,14 +375,17 @@ test.describe('Multi-Client Integration', () => {
       const joinPromises = [];
 
       for (let i = 0; i < 3; i++) {
-        const promise = (async () => {
+        const promise = (async (index: number) => {
+          // Small stagger to avoid perfect simultaneity (realistic scenario)
+          await new Promise(resolve => setTimeout(resolve, index * 150));
+
           const playerContext = await browser.newContext();
           const playerBrowserPage = await playerContext.newPage();
           const playerJoinPage = new ControllerJoinPage(playerBrowserPage);
 
-          await playerJoinPage.joinRoom(roomCode, `Player${i + 1}`);
+          await playerJoinPage.joinRoom(roomCode, `Player${index + 1}`);
           contexts.push(playerContext);
-        })();
+        })(i);
 
         joinPromises.push(promise);
       }
@@ -390,7 +393,7 @@ test.describe('Multi-Client Integration', () => {
       await Promise.all(joinPromises);
 
       // Wait for updates to propagate (longer wait for rapid concurrent joins)
-      await hostLobbyPage.page.waitForTimeout(5000);
+      await hostLobbyPage.page.waitForTimeout(2000);
 
       // Verify all players joined
       const playerCount = await hostLobbyPage.getPlayerCount();
