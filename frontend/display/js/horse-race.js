@@ -298,9 +298,13 @@ class HorseRaceDisplayController {
       this.bettingTimer = null;
     }
 
-    // Only render track lanes if not already rendered
+    // Render track lanes if not already rendered or if we need to re-render
     const trackLanes = this.elements.raceTrack.querySelector('.track-lanes');
-    if (!trackLanes.children.length && data.horses && data.horses.length > 0) {
+    const hasHorses = data.horses && data.horses.length > 0;
+
+    // Render if: no lanes exist yet, OR lanes exist but no sprites inside them
+    if (hasHorses && (!trackLanes.children.length || !trackLanes.querySelector('.horse-sprite'))) {
+      logger.info('Rendering race track with horses:', data.horses.length);
       this.renderRaceTrack(data.horses);
     }
 
@@ -341,14 +345,32 @@ class HorseRaceDisplayController {
     const horses = data.horses || [];
     const trackLength = 100; // Fixed track length
 
+    // Ensure track lanes are rendered before trying to update
+    const trackLanes = this.elements.raceTrack.querySelector('.track-lanes');
+    if (!trackLanes || !trackLanes.children.length) {
+      logger.warn('Cannot update positions: track lanes not rendered');
+      // Try to render them now if we have horses
+      if (horses.length > 0) {
+        logger.info('Rendering track lanes in updateRacePositions');
+        this.renderRaceTrack(horses);
+      }
+      return;
+    }
+
     horses.forEach((horse, index) => {
       const lane = this.elements.raceTrack.querySelector(
         `.horse-lane[data-horse-id="${index}"]`
       );
-      if (!lane) return;
+      if (!lane) {
+        logger.warn(`Lane not found for horse ${index}`);
+        return;
+      }
 
       const sprite = lane.querySelector('.horse-sprite');
-      if (!sprite) return;
+      if (!sprite) {
+        logger.warn(`Sprite not found for horse ${index}`);
+        return;
+      }
 
       // Calculate position as percentage (account for sprite width)
       const maxPosition = 90; // Leave room for horse sprite at finish line
