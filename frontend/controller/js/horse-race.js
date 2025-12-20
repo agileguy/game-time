@@ -19,6 +19,7 @@ class HorseRaceController {
     this.currentBet = null;
     this.playerScore = 0;
     this.bettingTimer = null;
+    this.currentPhase = null; // Track current phase to detect transitions
 
     this.init();
   }
@@ -204,8 +205,8 @@ class HorseRaceController {
       this.elements.playerScore.textContent = this.playerScore;
     }
 
-    // Show betting phase
-    this.showBettingPhase(data);
+    // Show betting phase (game start is a phase transition)
+    this.showBettingPhase(data, true);
   }
 
   /**
@@ -228,9 +229,14 @@ class HorseRaceController {
     // Update phase indicator
     this.updatePhaseIndicator(data.phase);
 
+    // Track if phase changed
+    const previousPhase = this.currentPhase;
+    const isPhaseTransition = previousPhase !== data.phase;
+    this.currentPhase = data.phase;
+
     switch (data.phase) {
       case 'setup':
-        this.showBettingPhase(data);
+        this.showBettingPhase(data, isPhaseTransition);
         break;
 
       case 'playing':
@@ -282,7 +288,7 @@ class HorseRaceController {
   /**
    * Show betting phase
    */
-  showBettingPhase(data) {
+  showBettingPhase(data, isPhaseTransition = false) {
     // Hide other phases
     this.elements.racingPhase.classList.add('hidden');
     this.elements.resultsPhase.classList.add('hidden');
@@ -297,9 +303,12 @@ class HorseRaceController {
       this.renderHorseSelection(data.horses);
     }
 
-    // Start countdown
-    const bettingDuration = data.betting_duration || 15;
-    this.startBettingCountdown(bettingDuration);
+    // Only start countdown on phase transition, not on every state update
+    // This prevents the countdown from resetting every second
+    if (isPhaseTransition) {
+      const bettingDuration = data.betting_duration || 15;
+      this.startBettingCountdown(bettingDuration);
+    }
 
     // If player already has a bet, show it
     if (this.currentBet !== null) {
