@@ -8,10 +8,12 @@ from redis.asyncio import Redis
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.games.horse_race import HorseRace
+from app.games.trivia import Trivia
 from app.main import app
 from app.models.game_session import GameSession
 from app.models.player import Player
 from app.models.room import Room
+from app.models.trivia_question import TriviaQuestion
 from app.services.game_manager import GameManager, GameRegistry
 
 
@@ -19,6 +21,7 @@ from app.services.game_manager import GameManager, GameRegistry
 def register_games():
     """Register games for testing."""
     GameRegistry.register(HorseRace)
+    GameRegistry.register(Trivia)
 
 
 @pytest.fixture
@@ -41,15 +44,21 @@ class TestGamesAPI:
         assert "games" in data
         assert len(data["games"]) > 0
 
-        # Verify horse_race is in the list
+        # Verify both games are in the list
         game_types = [game["type"] for game in data["games"]]
         assert "horse_race" in game_types
+        assert "trivia" in game_types
 
-        # Verify game structure
+        # Verify game structures
         horse_race = next(g for g in data["games"] if g["type"] == "horse_race")
         assert horse_race["name"] == "Horse Race"
         assert horse_race["min_players"] == 2
         assert horse_race["max_players"] == 12
+
+        trivia = next(g for g in data["games"] if g["type"] == "trivia")
+        assert trivia["name"] == "Trivia Challenge"
+        assert trivia["min_players"] == 2
+        assert trivia["max_players"] == 12
 
 
 @pytest.mark.integration
@@ -245,16 +254,20 @@ class TestGameRegistry:
     """Integration tests for GameRegistry."""
 
     def test_game_registered(self):
-        """Test that HorseRace is registered."""
+        """Test that both games are registered."""
         horse_race_class = GameRegistry.get("horse_race")
         assert horse_race_class == HorseRace
+
+        trivia_class = GameRegistry.get("trivia")
+        assert trivia_class == Trivia
 
     def test_list_games(self):
         """Test listing all registered games."""
         games = GameRegistry.list_games()
 
-        assert len(games) > 0
+        assert len(games) >= 2
         assert any(g["type"] == "horse_race" for g in games)
+        assert any(g["type"] == "trivia" for g in games)
 
     def test_get_invalid_game(self):
         """Test getting invalid game type."""
@@ -314,3 +327,222 @@ class TestHorseRaceGame:
         for player_id in player_ids:
             assert player_id in game.state.player_data
             assert "bet" in game.state.player_data[player_id]
+
+
+@pytest.mark.integration
+class TestTriviaGame:
+    """Integration tests for Trivia game flow."""
+
+    @pytest.fixture
+    async def test_questions(self, db_session: AsyncSession):
+        """Create test trivia questions in database."""
+        questions = []
+        for i in range(10):
+            question = TriviaQuestion(
+                question=f"Test question {i}?",
+                options=[f"Option A{i}", f"Option B{i}", f"Option C{i}", f"Option D{i}"],
+                correct_answer=i % 4,  # Vary correct answers
+                category="Test",
+                difficulty="easy",
+            )
+            db_session.add(question)
+            questions.append(question)
+
+        await db_session.commit()
+        for q in questions:
+            await db_session.refresh(q)
+
+        return questions
+
+    async def test_complete_game_flow(self, test_questions: list[TriviaQuestion]):
+        """Test complete trivia game from start to finish."""
+        player_ids = [f"{i:064x}" for i in range(3)]  # Valid 64-char hex IDs
+        game = Trivia(room_code="TEST", player_ids=player_ids)
+
+        # Start game (loads 5 questions)
+        await game.start()
+
+        assert game.state.phase.value == "setup"
+        assert "questions" in game.state.round_data
+        assert len(game.state.round_data["questions"]) == Trivia.NUM_QUESTIONS
+        assert game.state.round_data["current_question_index"] == 0
+
+        # Verify player data initialized
+        for player_id in player_ids:
+            assert player_id in game.state.player_data
+            assert game.state.player_data[player_id]["answers"] == []
+            assert game.state.scores[player_id] == 0
+
+        # Submit answers for first question
+        for i, player_id in enumerate(player_ids):
+            answer_result = await game.handle_player_action(
+                player_id, "submit_answer", {"answer": i % 4}
+            )
+            assert answer_result["success"] is True
+            assert game.state.player_data[player_id]["current_answer"] == i % 4
+
+    async def test_answer_submission(self, test_questions: list[TriviaQuestion]):
+        """Test answer submission validation."""
+        player_ids = [f"{i:064x}" for i in range(2)]
+        game = Trivia(room_code="TEST", player_ids=player_ids)
+
+        await game.start()
+
+        # Valid answer submission
+        result = await game.handle_player_action(player_ids[0], "submit_answer", {"answer": 2})
+        assert result["success"] is True
+        assert game.state.player_data[player_ids[0]]["current_answer"] == 2
+
+        # Invalid answer (out of range)
+        result = await game.handle_player_action(player_ids[1], "submit_answer", {"answer": 5})
+        assert "error" in result
+
+        # Invalid answer (negative)
+        result = await game.handle_player_action(player_ids[1], "submit_answer", {"answer": -1})
+        assert "error" in result
+
+    async def test_scoring(self, test_questions: list[TriviaQuestion]):
+        """Test scoring calculation."""
+        player_ids = [f"{i:064x}" for i in range(2)]
+        game = Trivia(room_code="TEST", player_ids=player_ids)
+
+        await game.start()
+
+        # Get correct answer for first question
+        correct_answer = game.state.round_data["questions"][0]["correct_answer"]
+
+        # Player 1: correct answer
+        await game.handle_player_action(player_ids[0], "submit_answer", {"answer": correct_answer})
+
+        # Player 2: wrong answer
+        wrong_answer = (correct_answer + 1) % 4
+        await game.handle_player_action(player_ids[1], "submit_answer", {"answer": wrong_answer})
+
+        # Manually trigger results calculation
+        await game._show_question_results()
+
+        # Player 1 should have points, Player 2 should not
+        assert game.state.scores[player_ids[0]] > 0
+        assert game.state.scores[player_ids[1]] == 0
+        assert game.state.player_data[player_ids[0]]["correct_count"] == 1
+        assert game.state.player_data[player_ids[1]]["correct_count"] == 0
+
+    async def test_speed_bonus(self, test_questions: list[TriviaQuestion]):
+        """Test that faster answers get higher scores."""
+        import time
+        from datetime import datetime, timezone
+
+        player_ids = [f"{i:064x}" for i in range(2)]
+        game = Trivia(room_code="TEST", player_ids=player_ids)
+
+        await game.start()
+
+        correct_answer = game.state.round_data["questions"][0]["correct_answer"]
+
+        # Player 1: instant answer
+        await game.handle_player_action(player_ids[0], "submit_answer", {"answer": correct_answer})
+        time.sleep(0.1)  # Small delay
+
+        # Player 2: delayed answer
+        time.sleep(2)
+        await game.handle_player_action(player_ids[1], "submit_answer", {"answer": correct_answer})
+
+        # Trigger results
+        await game._show_question_results()
+
+        # Both got it right, but player 1 should have higher score due to speed bonus
+        assert game.state.scores[player_ids[0]] > game.state.scores[player_ids[1]]
+
+    async def test_concurrent_answers(self, test_questions: list[TriviaQuestion]):
+        """Test multiple players answering concurrently."""
+        player_ids = [f"{i:064x}" for i in range(10)]
+        game = Trivia(room_code="TEST", player_ids=player_ids)
+
+        await game.start()
+
+        # Submit concurrent answers
+        answer_tasks = [
+            game.handle_player_action(player_id, "submit_answer", {"answer": i % 4})
+            for i, player_id in enumerate(player_ids)
+        ]
+
+        results = await asyncio.gather(*answer_tasks)
+
+        # All answers should succeed
+        assert all(r["success"] for r in results)
+
+        # All players should have answers
+        for player_id in player_ids:
+            assert player_id in game.state.player_data
+            assert "current_answer" in game.state.player_data[player_id]
+
+    async def test_get_state_hides_correct_answer_during_setup(
+        self, test_questions: list[TriviaQuestion]
+    ):
+        """Test that correct answer is hidden from players during question phase."""
+        player_ids = [f"{i:064x}" for i in range(2)]
+        game = Trivia(room_code="TEST", player_ids=player_ids)
+
+        await game.start()
+
+        # Get player state during setup
+        player_state = await game.get_state_for_player(player_ids[0])
+
+        assert player_state["phase"] == "setup"
+        assert "current_question" in player_state
+        # Correct answer should not be in player state during setup
+        assert "correct_answer" not in player_state["current_question"]
+
+        # Get display state during setup
+        display_state = await game.get_state_for_display()
+
+        assert display_state["phase"] == "setup"
+        assert "current_question" in display_state
+        # Correct answer should not be in display state during setup
+        assert "correct_answer" not in display_state["current_question"]
+
+    async def test_get_state_shows_correct_answer_in_results(
+        self, test_questions: list[TriviaQuestion]
+    ):
+        """Test that correct answer is shown during results phase."""
+        player_ids = [f"{i:064x}" for i in range(2)]
+        game = Trivia(room_code="TEST", player_ids=player_ids)
+
+        await game.start()
+
+        # Answer and move to results
+        await game.handle_player_action(player_ids[0], "submit_answer", {"answer": 0})
+        await game._show_question_results()
+
+        # Get player state during round_end
+        player_state = await game.get_state_for_player(player_ids[0])
+
+        assert player_state["phase"] == "round_end"
+        assert "current_question" in player_state
+        # Correct answer SHOULD be shown in results phase
+        assert "correct_answer" in player_state["current_question"]
+
+        # Get display state during round_end
+        display_state = await game.get_state_for_display()
+
+        assert display_state["phase"] == "round_end"
+        assert "correct_answer" in display_state["current_question"]
+
+    async def test_display_shows_answer_counts(self, test_questions: list[TriviaQuestion]):
+        """Test that display shows how many players picked each option."""
+        player_ids = [f"{i:064x}" for i in range(4)]
+        game = Trivia(room_code="TEST", player_ids=player_ids)
+
+        await game.start()
+
+        # Players answer: 0, 0, 1, 2
+        await game.handle_player_action(player_ids[0], "submit_answer", {"answer": 0})
+        await game.handle_player_action(player_ids[1], "submit_answer", {"answer": 0})
+        await game.handle_player_action(player_ids[2], "submit_answer", {"answer": 1})
+        await game.handle_player_action(player_ids[3], "submit_answer", {"answer": 2})
+
+        display_state = await game.get_state_for_display()
+
+        assert "answer_counts" in display_state
+        assert display_state["answer_counts"] == [2, 1, 1, 0]  # 2 for option 0, 1 for option 1, etc.
+        assert len(display_state["players_answered"]) == 4

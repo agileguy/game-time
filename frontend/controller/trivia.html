@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <title>Game Time - Trivia Challenge</title>
+
+  <!-- Shared CSS -->
+  <link rel="stylesheet" href="../shared/css/reset.css">
+  <link rel="stylesheet" href="../shared/css/variables.css">
+  <link rel="stylesheet" href="../shared/css/typography.css">
+  <link rel="stylesheet" href="../shared/css/utilities.css">
+
+  <!-- Controller CSS -->
+  <link rel="stylesheet" href="css/trivia.css">
+</head>
+<body class="controller-view">
+  <div class="trivia-controller-container full-height">
+    <!-- Header -->
+    <header class="trivia-header">
+      <div class="header-content">
+        <div class="player-info">
+          <div class="text-xs text-secondary">Your Score</div>
+          <div id="player-score" class="player-score">0</div>
+        </div>
+        <div class="phase-indicator">
+          <span id="phase-text" class="phase-text">Question</span>
+          <span id="phase-timer" class="phase-timer">10s</span>
+        </div>
+        <div class="connection-status">
+          <span id="connection-indicator" class="connection-dot connected"></span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="trivia-main">
+      <!-- Question Phase -->
+      <section id="question-phase" class="question-phase">
+        <div class="question-header">
+          <div class="question-number">
+            <span id="question-counter">Question 1 of 5</span>
+          </div>
+          <div class="question-category">
+            <span id="question-category">General</span>
+          </div>
+        </div>
+
+        <div class="question-content">
+          <div class="question-text-container">
+            <div id="question-text" class="question-text">
+              Loading question...
+            </div>
+          </div>
+        </div>
+
+        <div id="answer-options" class="answer-options">
+          <button class="answer-btn" data-answer="0">
+            <span class="answer-letter">A</span>
+            <span class="answer-text">Option A</span>
+          </button>
+          <button class="answer-btn" data-answer="1">
+            <span class="answer-letter">B</span>
+            <span class="answer-text">Option B</span>
+          </button>
+          <button class="answer-btn" data-answer="2">
+            <span class="answer-letter">C</span>
+            <span class="answer-text">Option C</span>
+          </button>
+          <button class="answer-btn" data-answer="3">
+            <span class="answer-letter">D</span>
+            <span class="answer-text">Option D</span>
+          </button>
+        </div>
+
+        <div id="answer-status" class="answer-status hidden">
+          <div class="status-icon">✓</div>
+          <div class="status-text">Answer Submitted!</div>
+          <div class="status-subtext">Waiting for other players...</div>
+        </div>
+      </section>
+
+      <!-- Results Phase -->
+      <section id="results-phase" class="results-phase hidden">
+        <div class="results-header">
+          <div id="result-icon" class="result-icon correct">✓</div>
+          <h2 id="result-text" class="result-text">Correct!</h2>
+        </div>
+
+        <div class="correct-answer-display">
+          <div class="correct-label">Correct Answer</div>
+          <div id="correct-answer" class="correct-answer">
+            <span class="answer-letter">C</span>
+            <span class="answer-text">Option C</span>
+          </div>
+        </div>
+
+        <div id="score-breakdown" class="score-breakdown">
+          <div class="breakdown-row">
+            <span class="breakdown-label">Base Points</span>
+            <span id="base-points" class="breakdown-value">+100</span>
+          </div>
+          <div class="breakdown-row">
+            <span class="breakdown-label">Speed Bonus</span>
+            <span id="speed-bonus" class="breakdown-value">+30</span>
+          </div>
+          <div class="breakdown-divider"></div>
+          <div class="breakdown-row breakdown-total">
+            <span class="breakdown-label">Round Score</span>
+            <span id="round-score" class="breakdown-value">+130</span>
+          </div>
+        </div>
+
+        <div class="total-score-display">
+          <div class="total-label">Total Score</div>
+          <div id="total-score" class="total-score">130</div>
+        </div>
+      </section>
+
+      <!-- Final Results Phase -->
+      <section id="final-phase" class="final-phase hidden">
+        <div class="final-header">
+          <div id="final-icon" class="final-icon">🏆</div>
+          <h2 id="final-title" class="final-title">Game Over!</h2>
+          <div id="final-subtitle" class="final-subtitle">You came in 1st place!</div>
+        </div>
+
+        <div class="final-stats">
+          <div class="stat-card">
+            <div class="stat-value" id="final-score-value">450</div>
+            <div class="stat-label">Total Points</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="correct-count">4</div>
+            <div class="stat-label">Correct Answers</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="accuracy">80%</div>
+            <div class="stat-label">Accuracy</div>
+          </div>
+        </div>
+
+        <div class="final-message">
+          <p id="final-message-text">Great job! 🎉</p>
+        </div>
+      </section>
+
+      <!-- Waiting Phase -->
+      <section id="waiting-phase" class="waiting-phase hidden">
+        <div class="waiting-content">
+          <div class="waiting-icon">⏳</div>
+          <h2 class="waiting-title">Get Ready!</h2>
+          <p class="waiting-text">Next question starting soon...</p>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="trivia-footer">
+      <div class="footer-content">
+        <div class="room-info">
+          <span class="text-secondary text-xs">Room:</span>
+          <span id="room-code" class="text-primary text-sm font-mono">----</span>
+        </div>
+        <div class="progress-info">
+          <div class="progress-dots" id="progress-dots">
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+          </div>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Scripts -->
+  <script type="module" src="js/trivia.js"></script>
+</body>
+</html>

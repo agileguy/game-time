@@ -14,6 +14,7 @@ from app.config import settings
 from app.core.logging import get_logger
 from app.database import close_db, init_db
 from app.games.horse_race import HorseRace
+from app.games.trivia import Trivia
 from app.redis_client import redis_client
 from app.routes import games, health, rooms, websocket
 from app.services.game_manager import GameManager, GameRegistry
@@ -143,6 +144,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
 
     # Register games
     GameRegistry.register(HorseRace)
+    GameRegistry.register(Trivia)
 
     # Start game state broadcaster
     _broadcaster_task = asyncio.create_task(broadcast_game_states())

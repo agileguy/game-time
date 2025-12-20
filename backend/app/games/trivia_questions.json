@@ -1,0 +1,884 @@
+{
+  "questions": [
+    {
+      "id": 1,
+      "question": "What is the capital of France?",
+      "options": ["London", "Berlin", "Paris", "Madrid"],
+      "correct_answer": 2,
+      "category": "Geography",
+      "difficulty": "easy"
+    },
+    {
+      "id": 2,
+      "question": "Which planet is known as the Red Planet?",
+      "options": ["Venus", "Mars", "Jupiter", "Saturn"],
+      "correct_answer": 1,
+      "category": "Science",
+      "difficulty": "easy"
+    },
+    {
+      "id": 3,
+      "question": "Who painted the Mona Lisa?",
+      "options": ["Vincent van Gogh", "Pablo Picasso", "Leonardo da Vinci", "Michelangelo"],
+      "correct_answer": 2,
+      "category": "Art",
+      "difficulty": "easy"
+    },
+    {
+      "id": 4,
+      "question": "What is the largest ocean on Earth?",
+      "options": ["Atlantic", "Indian", "Arctic", "Pacific"],
+      "correct_answer": 3,
+      "category": "Geography",
+      "difficulty": "easy"
+    },
+    {
+      "id": 5,
+      "question": "How many continents are there?",
+      "options": ["5", "6", "7", "8"],
+      "correct_answer": 2,
+      "category": "Geography",
+      "difficulty": "easy"
+    },
+    {
+      "id": 6,
+      "question": "What is the chemical symbol for gold?",
+      "options": ["Go", "Gd", "Au", "Ag"],
+      "correct_answer": 2,
+      "category": "Science",
+      "difficulty": "medium"
+    },
+    {
+      "id": 7,
+      "question": "In which year did World War II end?",
+      "options": ["1943", "1944", "1945", "1946"],
+      "correct_answer": 2,
+      "category": "History",
+      "difficulty": "medium"
+    },
+    {
+      "id": 8,
+      "question": "What is the smallest planet in our solar system?",
+      "options": ["Mercury", "Mars", "Venus", "Pluto"],
+      "correct_answer": 0,
+      "category": "Science",
+      "difficulty": "medium"
+    },
+    {
+      "id": 9,
+      "question": "Who wrote 'Romeo and Juliet'?",
+      "options": ["Charles Dickens", "William Shakespeare", "Jane Austen", "Mark Twain"],
+      "correct_answer": 1,
+      "category": "Literature",
+      "difficulty": "easy"
+    },
+    {
+      "id": 10,
+      "question": "What is the tallest mammal?",
+      "options": ["Elephant", "Giraffe", "Whale", "Hippopotamus"],
+      "correct_answer": 1,
+      "category": "Nature",
+      "difficulty": "easy"
+    },
+    {
+      "id": 11,
+      "question": "How many sides does a hexagon have?",
+      "options": ["5", "6", "7", "8"],
+      "correct_answer": 1,
+      "category": "Math",
+      "difficulty": "easy"
+    },
+    {
+      "id": 12,
+      "question": "What is the capital of Japan?",
+      "options": ["Seoul", "Beijing", "Tokyo", "Bangkok"],
+      "correct_answer": 2,
+      "category": "Geography",
+      "difficulty": "easy"
+    },
+    {
+      "id": 13,
+      "question": "Which element has the atomic number 1?",
+      "options": ["Helium", "Hydrogen", "Oxygen", "Carbon"],
+      "correct_answer": 1,
+      "category": "Science",
+      "difficulty": "medium"
+    },
+    {
+      "id": 14,
+      "question": "Who was the first President of the United States?",
+      "options": ["Thomas Jefferson", "John Adams", "George Washington", "Benjamin Franklin"],
+      "correct_answer": 2,
+      "category": "History",
+      "difficulty": "easy"
+    },
+    {
+      "id": 15,
+      "question": "What is the largest country by land area?",
+      "options": ["Canada", "China", "United States", "Russia"],
+      "correct_answer": 3,
+      "category": "Geography",
+      "difficulty": "easy"
+    },
+    {
+      "id": 16,
+      "question": "How many bones are in the adult human body?",
+      "options": ["186", "206", "226", "246"],
+      "correct_answer": 1,
+      "category": "Science",
+      "difficulty": "medium"
+    },
+    {
+      "id": 17,
+      "question": "Which programming language is known as 'the language of the web'?",
+      "options": ["Python", "Java", "JavaScript", "C++"],
+      "correct_answer": 2,
+      "category": "Technology",
+      "difficulty": "medium"
+    },
+    {
+      "id": 18,
+      "question": "What is the speed of light?",
+      "options": ["300,000 km/s", "150,000 km/s", "450,000 km/s", "600,000 km/s"],
+      "correct_answer": 0,
+      "category": "Science",
+      "difficulty": "hard"
+    },
+    {
+      "id": 19,
+      "question": "In which city is the Statue of Liberty located?",
+      "options": ["Boston", "Philadelphia", "New York", "Washington D.C."],
+      "correct_answer": 2,
+      "category": "Geography",
+      "difficulty": "easy"
+    },
+    {
+      "id": 20,
+      "question": "What is the largest organ in the human body?",
+      "options": ["Liver", "Brain", "Skin", "Heart"],
+      "correct_answer": 2,
+      "category": "Science",
+      "difficulty": "medium"
+    },
+    {
+      "id": 21,
+      "question": "Who invented the telephone?",
+      "options": ["Thomas Edison", "Alexander Graham Bell", "Nikola Tesla", "Benjamin Franklin"],
+      "correct_answer": 1,
+      "category": "History",
+      "difficulty": "medium"
+    },
+    {
+      "id": 22,
+      "question": "What is the currency of the United Kingdom?",
+      "options": ["Euro", "Dollar", "Pound Sterling", "Franc"],
+      "correct_answer": 2,
+      "category": "Geography",
+      "difficulty": "easy"
+    },
+    {
+      "id": 23,
+      "question": "How many players are on a soccer team?",
+      "options": ["9", "10", "11", "12"],
+      "correct_answer": 2,
+      "category": "Sports",
+      "difficulty": "easy"
+    },
+    {
+      "id": 24,
+      "question": "What is the freezing point of water in Celsius?",
+      "options": ["-5°C", "0°C", "5°C", "10°C"],
+      "correct_answer": 1,
+      "category": "Science",
+      "difficulty": "easy"
+    },
+    {
+      "id": 25,
+      "question": "Which country gifted the Statue of Liberty to the USA?",
+      "options": ["England", "France", "Spain", "Italy"],
+      "correct_answer": 1,
+      "category": "History",
+      "difficulty": "medium"
+    },
+    {
+      "id": 26,
+      "question": "What is the square root of 144?",
+      "options": ["10", "11", "12", "13"],
+      "correct_answer": 2,
+      "category": "Math",
+      "difficulty": "easy"
+    },
+    {
+      "id": 27,
+      "question": "Which ocean is the Bermuda Triangle located in?",
+      "options": ["Pacific", "Atlantic", "Indian", "Arctic"],
+      "correct_answer": 1,
+      "category": "Geography",
+      "difficulty": "medium"
+    },
+    {
+      "id": 28,
+      "question": "What does DNA stand for?",
+      "options": ["Deoxyribonucleic Acid", "Dinitrogen Acid", "Dynamic Nuclear Acid", "Dual Nucleic Acid"],
+      "correct_answer": 0,
+      "category": "Science",
+      "difficulty": "hard"
+    },
+    {
+      "id": 29,
+      "question": "Who wrote '1984'?",
+      "options": ["Aldous Huxley", "George Orwell", "Ray Bradbury", "Franz Kafka"],
+      "correct_answer": 1,
+      "category": "Literature",
+      "difficulty": "medium"
+    },
+    {
+      "id": 30,
+      "question": "What is the capital of Australia?",
+      "options": ["Sydney", "Melbourne", "Canberra", "Perth"],
+      "correct_answer": 2,
+      "category": "Geography",
+      "difficulty": "medium"
+    },
+    {
+      "id": 31,
+      "question": "How many strings does a standard guitar have?",
+      "options": ["4", "5", "6", "7"],
+      "correct_answer": 2,
+      "category": "Music",
+      "difficulty": "easy"
+    },
+    {
+      "id": 32,
+      "question": "What is the longest river in the world?",
+      "options": ["Amazon", "Nile", "Mississippi", "Yangtze"],
+      "correct_answer": 1,
+      "category": "Geography",
+      "difficulty": "medium"
+    },
+    {
+      "id": 33,
+      "question": "Which gas do plants absorb from the atmosphere?",
+      "options": ["Oxygen", "Nitrogen", "Carbon Dioxide", "Hydrogen"],
+      "correct_answer": 2,
+      "category": "Science",
+      "difficulty": "easy"
+    },
+    {
+      "id": 34,
+      "question": "In which year did the Titanic sink?",
+      "options": ["1910", "1911", "1912", "1913"],
+      "correct_answer": 2,
+      "category": "History",
+      "difficulty": "medium"
+    },
+    {
+      "id": 35,
+      "question": "What is the smallest country in the world?",
+      "options": ["Monaco", "Vatican City", "San Marino", "Liechtenstein"],
+      "correct_answer": 1,
+      "category": "Geography",
+      "difficulty": "medium"
+    },
+    {
+      "id": 36,
+      "question": "How many colors are in a rainbow?",
+      "options": ["5", "6", "7", "8"],
+      "correct_answer": 2,
+      "category": "Science",
+      "difficulty": "easy"
+    },
+    {
+      "id": 37,
+      "question": "Who painted 'The Starry Night'?",
+      "options": ["Claude Monet", "Vincent van Gogh", "Pablo Picasso", "Salvador Dali"],
+      "correct_answer": 1,
+      "category": "Art",
+      "difficulty": "medium"
+    },
+    {
+      "id": 38,
+      "question": "What is the hardest natural substance on Earth?",
+      "options": ["Gold", "Iron", "Diamond", "Platinum"],
+      "correct_answer": 2,
+      "category": "Science",
+      "difficulty": "medium"
+    },
+    {
+      "id": 39,
+      "question": "Which planet is closest to the Sun?",
+      "options": ["Venus", "Earth", "Mercury", "Mars"],
+      "correct_answer": 2,
+      "category": "Science",
+      "difficulty": "easy"
+    },
+    {
+      "id": 40,
+      "question": "What year did Christopher Columbus discover America?",
+      "options": ["1482", "1492", "1502", "1512"],
+      "correct_answer": 1,
+      "category": "History",
+      "difficulty": "medium"
+    },
+    {
+      "id": 41,
+      "question": "How many days are in a leap year?",
+      "options": ["364", "365", "366", "367"],
+      "correct_answer": 2,
+      "category": "General",
+      "difficulty": "easy"
+    },
+    {
+      "id": 42,
+      "question": "What is the capital of Canada?",
+      "options": ["Toronto", "Vancouver", "Ottawa", "Montreal"],
+      "correct_answer": 2,
+      "category": "Geography",
+      "difficulty": "medium"
+    },
+    {
+      "id": 43,
+      "question": "Which is the largest planet in our solar system?",
+      "options": ["Saturn", "Jupiter", "Neptune", "Uranus"],
+      "correct_answer": 1,
+      "category": "Science",
+      "difficulty": "easy"
+    },
+    {
+      "id": 44,
+      "question": "How many hearts does an octopus have?",
+      "options": ["1", "2", "3", "4"],
+      "correct_answer": 2,
+      "category": "Nature",
+      "difficulty": "hard"
+    },
+    {
+      "id": 45,
+      "question": "What is the tallest mountain in the world?",
+      "options": ["K2", "Mount Everest", "Kilimanjaro", "Denali"],
+      "correct_answer": 1,
+      "category": "Geography",
+      "difficulty": "easy"
+    },
+    {
+      "id": 46,
+      "question": "Which country invented pizza?",
+      "options": ["France", "Greece", "Italy", "Spain"],
+      "correct_answer": 2,
+      "category": "Culture",
+      "difficulty": "easy"
+    },
+    {
+      "id": 47,
+      "question": "What is the boiling point of water in Fahrenheit?",
+      "options": ["180°F", "200°F", "212°F", "232°F"],
+      "correct_answer": 2,
+      "category": "Science",
+      "difficulty": "medium"
+    },
+    {
+      "id": 48,
+      "question": "Who developed the theory of relativity?",
+      "options": ["Isaac Newton", "Nikola Tesla", "Albert Einstein", "Stephen Hawking"],
+      "correct_answer": 2,
+      "category": "Science",
+      "difficulty": "medium"
+    },
+    {
+      "id": 49,
+      "question": "What is the currency of Japan?",
+      "options": ["Won", "Yuan", "Yen", "Ringgit"],
+      "correct_answer": 2,
+      "category": "Geography",
+      "difficulty": "medium"
+    },
+    {
+      "id": 50,
+      "question": "How many keys are on a standard piano?",
+      "options": ["76", "81", "88", "92"],
+      "correct_answer": 2,
+      "category": "Music",
+      "difficulty": "hard"
+    },
+    {
+      "id": 51,
+      "question": "What is the largest desert in the world?",
+      "options": ["Sahara", "Antarctic", "Arabian", "Gobi"],
+      "correct_answer": 1,
+      "category": "Geography",
+      "difficulty": "hard"
+    },
+    {
+      "id": 52,
+      "question": "Which vitamin is produced when skin is exposed to sunlight?",
+      "options": ["Vitamin A", "Vitamin C", "Vitamin D", "Vitamin E"],
+      "correct_answer": 2,
+      "category": "Science",
+      "difficulty": "medium"
+    },
+    {
+      "id": 53,
+      "question": "What is the fastest land animal?",
+      "options": ["Lion", "Cheetah", "Leopard", "Horse"],
+      "correct_answer": 1,
+      "category": "Nature",
+      "difficulty": "easy"
+    },
+    {
+      "id": 54,
+      "question": "How many teeth does an adult human have?",
+      "options": ["28", "30", "32", "34"],
+      "correct_answer": 2,
+      "category": "Science",
+      "difficulty": "medium"
+    },
+    {
+      "id": 55,
+      "question": "Which country has the most time zones?",
+      "options": ["Russia", "USA", "France", "China"],
+      "correct_answer": 2,
+      "category": "Geography",
+      "difficulty": "hard"
+    },
+    {
+      "id": 56,
+      "question": "What is the chemical symbol for water?",
+      "options": ["H2O", "O2", "CO2", "H2"],
+      "correct_answer": 0,
+      "category": "Science",
+      "difficulty": "easy"
+    },
+    {
+      "id": 57,
+      "question": "Who was the first person to walk on the moon?",
+      "options": ["Buzz Aldrin", "Neil Armstrong", "Yuri Gagarin", "John Glenn"],
+      "correct_answer": 1,
+      "category": "History",
+      "difficulty": "easy"
+    },
+    {
+      "id": 58,
+      "question": "What is the capital of Italy?",
+      "options": ["Venice", "Milan", "Rome", "Florence"],
+      "correct_answer": 2,
+      "category": "Geography",
+      "difficulty": "easy"
+    },
+    {
+      "id": 59,
+      "question": "How many legs does a spider have?",
+      "options": ["6", "8", "10", "12"],
+      "correct_answer": 1,
+      "category": "Nature",
+      "difficulty": "easy"
+    },
+    {
+      "id": 60,
+      "question": "Which is the longest bone in the human body?",
+      "options": ["Tibia", "Fibula", "Femur", "Humerus"],
+      "correct_answer": 2,
+      "category": "Science",
+      "difficulty": "medium"
+    },
+    {
+      "id": 61,
+      "question": "What is the smallest prime number?",
+      "options": ["0", "1", "2", "3"],
+      "correct_answer": 2,
+      "category": "Math",
+      "difficulty": "medium"
+    },
+    {
+      "id": 62,
+      "question": "Which country is famous for the Eiffel Tower?",
+      "options": ["Italy", "France", "Spain", "Belgium"],
+      "correct_answer": 1,
+      "category": "Geography",
+      "difficulty": "easy"
+    },
+    {
+      "id": 63,
+      "question": "What does HTTP stand for?",
+      "options": ["HyperText Transfer Protocol", "High Transfer Text Protocol", "HyperText Transmission Process", "High Tech Transfer Protocol"],
+      "correct_answer": 0,
+      "category": "Technology",
+      "difficulty": "medium"
+    },
+    {
+      "id": 64,
+      "question": "How many Olympic rings are there?",
+      "options": ["3", "4", "5", "6"],
+      "correct_answer": 2,
+      "category": "Sports",
+      "difficulty": "easy"
+    },
+    {
+      "id": 65,
+      "question": "What is the capital of Spain?",
+      "options": ["Barcelona", "Seville", "Madrid", "Valencia"],
+      "correct_answer": 2,
+      "category": "Geography",
+      "difficulty": "easy"
+    },
+    {
+      "id": 66,
+      "question": "Which metal is liquid at room temperature?",
+      "options": ["Iron", "Mercury", "Gold", "Silver"],
+      "correct_answer": 1,
+      "category": "Science",
+      "difficulty": "medium"
+    },
+    {
+      "id": 67,
+      "question": "Who wrote 'Harry Potter'?",
+      "options": ["J.R.R. Tolkien", "C.S. Lewis", "J.K. Rowling", "Roald Dahl"],
+      "correct_answer": 2,
+      "category": "Literature",
+      "difficulty": "easy"
+    },
+    {
+      "id": 68,
+      "question": "What is the largest mammal in the world?",
+      "options": ["African Elephant", "Blue Whale", "Giraffe", "Polar Bear"],
+      "correct_answer": 1,
+      "category": "Nature",
+      "difficulty": "easy"
+    },
+    {
+      "id": 69,
+      "question": "How many minutes are in a full day?",
+      "options": ["1,200", "1,440", "1,680", "1,920"],
+      "correct_answer": 1,
+      "category": "Math",
+      "difficulty": "medium"
+    },
+    {
+      "id": 70,
+      "question": "What is the capital of Egypt?",
+      "options": ["Alexandria", "Cairo", "Giza", "Luxor"],
+      "correct_answer": 1,
+      "category": "Geography",
+      "difficulty": "easy"
+    },
+    {
+      "id": 71,
+      "question": "Which planet has the most moons?",
+      "options": ["Jupiter", "Saturn", "Uranus", "Neptune"],
+      "correct_answer": 1,
+      "category": "Science",
+      "difficulty": "hard"
+    },
+    {
+      "id": 72,
+      "question": "In which year did World War I begin?",
+      "options": ["1912", "1914", "1916", "1918"],
+      "correct_answer": 1,
+      "category": "History",
+      "difficulty": "medium"
+    },
+    {
+      "id": 73,
+      "question": "What is the name of the process by which plants make food?",
+      "options": ["Respiration", "Photosynthesis", "Digestion", "Osmosis"],
+      "correct_answer": 1,
+      "category": "Science",
+      "difficulty": "easy"
+    },
+    {
+      "id": 74,
+      "question": "How many states are in the USA?",
+      "options": ["48", "49", "50", "51"],
+      "correct_answer": 2,
+      "category": "Geography",
+      "difficulty": "easy"
+    },
+    {
+      "id": 75,
+      "question": "What is the largest bird in the world?",
+      "options": ["Eagle", "Albatross", "Ostrich", "Condor"],
+      "correct_answer": 2,
+      "category": "Nature",
+      "difficulty": "medium"
+    },
+    {
+      "id": 76,
+      "question": "Who invented the light bulb?",
+      "options": ["Nikola Tesla", "Thomas Edison", "Alexander Graham Bell", "Benjamin Franklin"],
+      "correct_answer": 1,
+      "category": "History",
+      "difficulty": "easy"
+    },
+    {
+      "id": 77,
+      "question": "What is the chemical symbol for silver?",
+      "options": ["Si", "Ag", "Au", "Sr"],
+      "correct_answer": 1,
+      "category": "Science",
+      "difficulty": "medium"
+    },
+    {
+      "id": 78,
+      "question": "Which is the hottest planet in our solar system?",
+      "options": ["Mercury", "Venus", "Mars", "Jupiter"],
+      "correct_answer": 1,
+      "category": "Science",
+      "difficulty": "medium"
+    },
+    {
+      "id": 79,
+      "question": "What is the national language of Brazil?",
+      "options": ["Spanish", "Portuguese", "French", "English"],
+      "correct_answer": 1,
+      "category": "Geography",
+      "difficulty": "medium"
+    },
+    {
+      "id": 80,
+      "question": "How many sides does a pentagon have?",
+      "options": ["4", "5", "6", "7"],
+      "correct_answer": 1,
+      "category": "Math",
+      "difficulty": "easy"
+    },
+    {
+      "id": 81,
+      "question": "What is the largest internal organ?",
+      "options": ["Heart", "Brain", "Liver", "Lungs"],
+      "correct_answer": 2,
+      "category": "Science",
+      "difficulty": "medium"
+    },
+    {
+      "id": 82,
+      "question": "Which country is home to the kangaroo?",
+      "options": ["New Zealand", "South Africa", "Australia", "Madagascar"],
+      "correct_answer": 2,
+      "category": "Geography",
+      "difficulty": "easy"
+    },
+    {
+      "id": 83,
+      "question": "What does CPU stand for?",
+      "options": ["Central Processing Unit", "Computer Personal Unit", "Central Processor Utility", "Core Processing Unit"],
+      "correct_answer": 0,
+      "category": "Technology",
+      "difficulty": "medium"
+    },
+    {
+      "id": 84,
+      "question": "How many degrees are in a right angle?",
+      "options": ["45", "60", "90", "180"],
+      "correct_answer": 2,
+      "category": "Math",
+      "difficulty": "easy"
+    },
+    {
+      "id": 85,
+      "question": "Who painted the ceiling of the Sistine Chapel?",
+      "options": ["Leonardo da Vinci", "Raphael", "Michelangelo", "Donatello"],
+      "correct_answer": 2,
+      "category": "Art",
+      "difficulty": "medium"
+    },
+    {
+      "id": 86,
+      "question": "What is the largest island in the world?",
+      "options": ["Madagascar", "Greenland", "New Guinea", "Borneo"],
+      "correct_answer": 1,
+      "category": "Geography",
+      "difficulty": "medium"
+    },
+    {
+      "id": 87,
+      "question": "How many zeros are in one million?",
+      "options": ["4", "5", "6", "7"],
+      "correct_answer": 2,
+      "category": "Math",
+      "difficulty": "easy"
+    },
+    {
+      "id": 88,
+      "question": "Which gas is most abundant in Earth's atmosphere?",
+      "options": ["Oxygen", "Carbon Dioxide", "Nitrogen", "Hydrogen"],
+      "correct_answer": 2,
+      "category": "Science",
+      "difficulty": "medium"
+    },
+    {
+      "id": 89,
+      "question": "In which country would you find the Great Wall?",
+      "options": ["Japan", "China", "Mongolia", "Korea"],
+      "correct_answer": 1,
+      "category": "Geography",
+      "difficulty": "easy"
+    },
+    {
+      "id": 90,
+      "question": "What is the smallest unit of life?",
+      "options": ["Atom", "Molecule", "Cell", "Organ"],
+      "correct_answer": 2,
+      "category": "Science",
+      "difficulty": "medium"
+    },
+    {
+      "id": 91,
+      "question": "Who wrote 'The Odyssey'?",
+      "options": ["Virgil", "Homer", "Sophocles", "Euripides"],
+      "correct_answer": 1,
+      "category": "Literature",
+      "difficulty": "hard"
+    },
+    {
+      "id": 92,
+      "question": "How many chambers does the human heart have?",
+      "options": ["2", "3", "4", "5"],
+      "correct_answer": 2,
+      "category": "Science",
+      "difficulty": "medium"
+    },
+    {
+      "id": 93,
+      "question": "What is the capital of Russia?",
+      "options": ["St. Petersburg", "Moscow", "Kiev", "Minsk"],
+      "correct_answer": 1,
+      "category": "Geography",
+      "difficulty": "easy"
+    },
+    {
+      "id": 94,
+      "question": "Which element has the chemical symbol 'Fe'?",
+      "options": ["Iron", "Fluorine", "Francium", "Fermium"],
+      "correct_answer": 0,
+      "category": "Science",
+      "difficulty": "medium"
+    },
+    {
+      "id": 95,
+      "question": "How many seconds are in an hour?",
+      "options": ["1,800", "2,400", "3,000", "3,600"],
+      "correct_answer": 3,
+      "category": "Math",
+      "difficulty": "medium"
+    },
+    {
+      "id": 96,
+      "question": "Which is the world's largest rainforest?",
+      "options": ["Congo", "Amazon", "Southeast Asian", "Daintree"],
+      "correct_answer": 1,
+      "category": "Geography",
+      "difficulty": "easy"
+    },
+    {
+      "id": 97,
+      "question": "What is the rarest blood type?",
+      "options": ["O negative", "AB negative", "B negative", "A negative"],
+      "correct_answer": 1,
+      "category": "Science",
+      "difficulty": "hard"
+    },
+    {
+      "id": 98,
+      "question": "How many teeth does an adult human typically have?",
+      "options": ["28", "30", "32", "34"],
+      "correct_answer": 2,
+      "category": "Science",
+      "difficulty": "medium"
+    },
+    {
+      "id": 99,
+      "question": "Which country invented fireworks?",
+      "options": ["Japan", "China", "India", "Korea"],
+      "correct_answer": 1,
+      "category": "History",
+      "difficulty": "medium"
+    },
+    {
+      "id": 100,
+      "question": "What is the currency of Switzerland?",
+      "options": ["Euro", "Franc", "Krona", "Mark"],
+      "correct_answer": 1,
+      "category": "Geography",
+      "difficulty": "medium"
+    },
+    {
+      "id": 101,
+      "question": "How many rings are on the Olympic flag?",
+      "options": ["3", "4", "5", "6"],
+      "correct_answer": 2,
+      "category": "Sports",
+      "difficulty": "easy"
+    },
+    {
+      "id": 102,
+      "question": "Which planet is known for its rings?",
+      "options": ["Jupiter", "Saturn", "Uranus", "Neptune"],
+      "correct_answer": 1,
+      "category": "Science",
+      "difficulty": "easy"
+    },
+    {
+      "id": 103,
+      "question": "What is the capital of Germany?",
+      "options": ["Munich", "Hamburg", "Berlin", "Frankfurt"],
+      "correct_answer": 2,
+      "category": "Geography",
+      "difficulty": "easy"
+    },
+    {
+      "id": 104,
+      "question": "How many months have 31 days?",
+      "options": ["6", "7", "8", "9"],
+      "correct_answer": 1,
+      "category": "General",
+      "difficulty": "medium"
+    },
+    {
+      "id": 105,
+      "question": "Which bird is often associated with delivering babies?",
+      "options": ["Crane", "Stork", "Pelican", "Heron"],
+      "correct_answer": 1,
+      "category": "Culture",
+      "difficulty": "easy"
+    },
+    {
+      "id": 106,
+      "question": "What is the main component of the Sun?",
+      "options": ["Helium", "Hydrogen", "Oxygen", "Carbon"],
+      "correct_answer": 1,
+      "category": "Science",
+      "difficulty": "medium"
+    },
+    {
+      "id": 107,
+      "question": "In which ocean is the Mariana Trench located?",
+      "options": ["Atlantic", "Pacific", "Indian", "Arctic"],
+      "correct_answer": 1,
+      "category": "Geography",
+      "difficulty": "hard"
+    },
+    {
+      "id": 108,
+      "question": "How many stripes are on the American flag?",
+      "options": ["11", "12", "13", "14"],
+      "correct_answer": 2,
+      "category": "History",
+      "difficulty": "medium"
+    },
+    {
+      "id": 109,
+      "question": "What is the powerhouse of the cell?",
+      "options": ["Nucleus", "Ribosome", "Mitochondria", "Chloroplast"],
+      "correct_answer": 2,
+      "category": "Science",
+      "difficulty": "medium"
+    },
+    {
+      "id": 110,
+      "question": "Which country has the longest coastline?",
+      "options": ["Australia", "Russia", "Canada", "USA"],
+      "correct_answer": 2,
+      "category": "Geography",
+      "difficulty": "hard"
+    }
+  ]
+}

@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Game Time - Trivia Challenge Display</title>
+
+  <!-- Shared CSS -->
+  <link rel="stylesheet" href="../shared/css/reset.css">
+  <link rel="stylesheet" href="../shared/css/variables.css">
+  <link rel="stylesheet" href="../shared/css/typography.css">
+  <link rel="stylesheet" href="../shared/css/utilities.css">
+
+  <!-- Display CSS -->
+  <link rel="stylesheet" href="css/trivia.css">
+</head>
+<body class="display-view">
+  <div class="trivia-display-container full-height">
+    <!-- Header -->
+    <header class="trivia-header">
+      <div class="header-content">
+        <div class="logo">
+          <span class="logo-icon">❓</span>
+          <span class="logo-text">Trivia Challenge</span>
+        </div>
+        <div class="game-info">
+          <span id="question-progress" class="question-progress">Question 1 of 5</span>
+          <span id="timer" class="timer">10s</span>
+        </div>
+        <div class="room-display">
+          <span class="room-label">Room</span>
+          <span id="room-code" class="room-code">----</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="trivia-main">
+      <!-- Question Phase -->
+      <section id="question-phase" class="question-phase">
+        <div class="question-container">
+          <div class="question-header">
+            <div id="question-category" class="question-category">General</div>
+          </div>
+          <div class="question-display">
+            <div id="question-text" class="question-text">
+              Loading question...
+            </div>
+          </div>
+        </div>
+
+        <div class="options-container">
+          <div id="options-grid" class="options-grid">
+            <div class="option-card" data-option="0">
+              <div class="option-header">
+                <span class="option-letter">A</span>
+              </div>
+              <div class="option-text">Option A</div>
+              <div class="option-stats">
+                <span class="answer-count">0</span>
+                <span class="answer-label">players</span>
+              </div>
+            </div>
+
+            <div class="option-card" data-option="1">
+              <div class="option-header">
+                <span class="option-letter">B</span>
+              </div>
+              <div class="option-text">Option B</div>
+              <div class="option-stats">
+                <span class="answer-count">0</span>
+                <span class="answer-label">players</span>
+              </div>
+            </div>
+
+            <div class="option-card" data-option="2">
+              <div class="option-header">
+                <span class="option-letter">C</span>
+              </div>
+              <div class="option-text">Option C</div>
+              <div class="option-stats">
+                <span class="answer-count">0</span>
+                <span class="answer-label">players</span>
+              </div>
+            </div>
+
+            <div class="option-card" data-option="3">
+              <div class="option-header">
+                <span class="option-letter">D</span>
+              </div>
+              <div class="option-text">Option D</div>
+              <div class="option-stats">
+                <span class="answer-count">0</span>
+                <span class="answer-label">players</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="players-status">
+          <div class="status-label">Player Status</div>
+          <div id="players-list" class="players-list">
+            <!-- Player indicators will be inserted here -->
+          </div>
+        </div>
+      </section>
+
+      <!-- Results Phase -->
+      <section id="results-phase" class="results-phase hidden">
+        <div class="correct-answer-reveal">
+          <div class="reveal-label">Correct Answer</div>
+          <div id="correct-answer-card" class="correct-answer-card">
+            <span class="answer-letter-large">C</span>
+            <span class="answer-text-large">Option C</span>
+          </div>
+        </div>
+
+        <div class="round-results">
+          <div class="results-header">
+            <h3>Round Results</h3>
+          </div>
+          <div id="player-results-list" class="player-results-list">
+            <!-- Player results will be inserted here -->
+          </div>
+        </div>
+
+        <div class="current-standings">
+          <div class="standings-header">
+            <h3>Current Standings</h3>
+          </div>
+          <div id="standings-list" class="standings-list">
+            <!-- Standings will be inserted here -->
+          </div>
+        </div>
+      </section>
+
+      <!-- Final Results Phase -->
+      <section id="final-phase" class="final-phase hidden">
+        <div class="final-header">
+          <div class="final-icon">🏆</div>
+          <h1 class="final-title">Game Over!</h1>
+        </div>
+
+        <div class="winner-display">
+          <div class="winner-label">Champion</div>
+          <div id="winner-name" class="winner-name">Player 1</div>
+          <div id="winner-score" class="winner-score">500 points</div>
+        </div>
+
+        <div class="final-leaderboard">
+          <div class="leaderboard-header">
+            <h3>Final Leaderboard</h3>
+          </div>
+          <div id="final-leaderboard-list" class="leaderboard-list">
+            <!-- Final leaderboard will be inserted here -->
+          </div>
+        </div>
+      </section>
+
+      <!-- Waiting Phase -->
+      <section id="waiting-phase" class="waiting-phase hidden">
+        <div class="waiting-content">
+          <div class="waiting-icon">⏳</div>
+          <h2 class="waiting-title">Get Ready!</h2>
+          <p class="waiting-text">Next question starting soon...</p>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="trivia-footer">
+      <div class="footer-content">
+        <div class="game-code">
+          <span class="game-label">Game Code:</span>
+          <span id="footer-room-code" class="game-code-value">----</span>
+        </div>
+        <div class="progress-bar-container">
+          <div id="progress-bar" class="progress-bar">
+            <div id="progress-fill" class="progress-fill" style="width: 0%"></div>
+          </div>
+        </div>
+        <div class="game-status">
+          <span id="connection-status" class="connection-status">●</span>
+          <span id="player-count" class="player-count">0 players</span>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Scripts -->
+  <script type="module" src="js/trivia.js"></script>
+</body>
+</html>
