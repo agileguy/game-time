@@ -390,32 +390,6 @@ test.describe('Horse Race Game', () => {
       await hostContext?.close();
     });
 
-    // Skipped: Horse race correctly requires minimum 2 players
-    // This test expects single player to work but backend enforces min_players=2
-    test.skip('should handle single player game', async () => {
-      // Select and start game with just one player
-      await hostLobby.page.waitForTimeout(1000);
-      const horseRaceCard = hostLobby.page.locator('.game-card[data-game-type="horse_race"]');
-      await horseRaceCard.waitFor({ state: 'visible', timeout: 10000 });
-      await horseRaceCard.click();
-      await hostLobby.page.waitForTimeout(500);
-
-      // Should be able to start even with 1 player (min is 2 but host can override)
-      const isEnabled = await hostLobby.isStartGameButtonEnabled();
-      expect(isEnabled).toBe(true);
-
-      await hostLobby.clickStartGame();
-      await hostLobby.page.waitForURL('**/controller/horse-race.html', { timeout: 10000 });
-
-      // Should still show betting phase
-      await hostGame.waitForBettingPhase();
-      expect(await hostGame.isBettingPhaseVisible()).toBe(true);
-
-      // Should have 4 horses
-      const horses = await hostGame.getAvailableHorses();
-      expect(horses).toHaveLength(4);
-    });
-
     test('should handle player not placing bet', async ({ browser }) => {
       // Add a second player
       const player1Context = await browser.newContext();
