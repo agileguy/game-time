@@ -63,19 +63,35 @@ async def broadcast_game_states():
                                         break
 
                                 if not session_id:
+                                    logger.debug(f"No session_id found for connection {connection_id}")
                                     continue
 
                                 # Get player-specific state
-                                player_state = await game_manager.get_state_for_player(room_code, session_id)
+                                try:
+                                    player_state = await game_manager.get_state_for_player(room_code, session_id)
 
-                                # Send to this specific player
-                                await connection_manager.send_personal_message(
-                                    message={
-                                        "type": "game_state_update",
-                                        "data": player_state,
-                                    },
-                                    connection_id=connection_id,
-                                )
+                                    # Validate state has required fields
+                                    if not player_state or "horses" not in player_state:
+                                        logger.warning(
+                                            f"Invalid player state for {session_id} in room {room_code}: {player_state}"
+                                        )
+                                        continue
+
+                                    # Send to this specific player
+                                    await connection_manager.send_personal_message(
+                                        message={
+                                            "type": "game_state_update",
+                                            "data": player_state,
+                                        },
+                                        connection_id=connection_id,
+                                    )
+                                except Exception as state_error:
+                                    logger.warning(
+                                        f"Error getting state for player {session_id}: {state_error}"
+                                    )
+                                    # Don't send update if we can't get valid state
+                                    continue
+
                             except Exception as e:
                                 logger.debug(f"Error broadcasting to {connection_id}: {e}")
 
