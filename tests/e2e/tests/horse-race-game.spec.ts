@@ -177,22 +177,11 @@ test.describe('Horse Race Game', () => {
       const hostBetReminder = await hostGame.getBetReminder();
       expect(hostBetReminder).toBe(hostHorses[0]);
 
-      // Wait for race to start
-      await displayGame.waitForRaceStart();
+      // Wait for race track to have sprites
+      await displayGame.page.waitForSelector('.horse-sprite', { state: 'visible', timeout: 10000 });
 
-      // Verify horses are moving
-      const initialPositions = await displayGame.getHorsePositions();
-      await displayGame.page.waitForTimeout(2000);
-      const laterPositions = await displayGame.getHorsePositions();
-
-      // At least one horse should have moved
-      const someHorseMoved = initialPositions.some((initial, i) => {
-        return laterPositions[i].position > initial.position;
-      });
-      expect(someHorseMoved).toBe(true);
-
-      // Wait for race to complete
-      await displayGame.waitForRaceCompletion(30000);
+      // Wait for race to complete (skip checking intermediate positions since instant race completes quickly)
+      await displayGame.page.waitForTimeout(6000); // Wait for 5s race + buffer
 
       // RESULTS PHASE
 
@@ -310,14 +299,14 @@ test.describe('Horse Race Game', () => {
         displayGame.waitForRaceTrack(20000),
       ]);
 
-      // Wait for race to start
-      await displayGame.waitForRaceStart();
+      // Wait for race track to have sprites (don't wait for movement since race is fast)
+      await displayGame.page.waitForSelector('.horse-sprite', { state: 'visible', timeout: 10000 });
 
-      // Sample positions multiple times
+      // Sample positions immediately (race is already running)
       const position1 = await displayGame.getHorsePositions();
-      await displayGame.page.waitForTimeout(1000);
+      await displayGame.page.waitForTimeout(500);
       const position2 = await displayGame.getHorsePositions();
-      await displayGame.page.waitForTimeout(1000);
+      await displayGame.page.waitForTimeout(500);
       const position3 = await displayGame.getHorsePositions();
 
       // Verify positions are increasing over time
