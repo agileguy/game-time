@@ -298,8 +298,11 @@ class HorseRaceDisplayController {
       this.bettingTimer = null;
     }
 
-    // Render track lanes
-    this.renderRaceTrack(data.horses || []);
+    // Only render track lanes if not already rendered
+    const trackLanes = this.elements.raceTrack.querySelector('.track-lanes');
+    if (!trackLanes.children.length && data.horses && data.horses.length > 0) {
+      this.renderRaceTrack(data.horses);
+    }
 
     // Update phase timer
     this.elements.phaseTimer.textContent = '🏁';
