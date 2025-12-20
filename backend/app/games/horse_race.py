@@ -145,9 +145,7 @@ class HorseRace(BaseGame):
         else:
             return {"error": f"Unknown action: {action}"}
 
-    async def _handle_place_bet(
-        self, player_id: str, data: dict[str, Any]
-    ) -> dict[str, Any]:
+    async def _handle_place_bet(self, player_id: str, data: dict[str, Any]) -> dict[str, Any]:
         """Handle a player placing a bet."""
         if self.state.phase != GamePhase.SETUP:
             return {"error": "Betting phase is over"}
@@ -195,18 +193,18 @@ class HorseRace(BaseGame):
         # Simulate race animation by gradually moving horses
         # Update positions every 200ms for 5 seconds (25 updates total)
         updates = 25
-        for update_num in range(updates):
+        for _update_num in range(updates):
             await asyncio.sleep(0.2)  # 200ms between updates
 
             # Move each horse forward by a random amount
-            for i, horse in enumerate(horses):
+            for _i, horse in enumerate(horses):
                 if horse["position"] < self.TRACK_LENGTH:
                     # Random progress (3-5% of track per update)
                     movement = random.uniform(3.0, 5.0)
                     horse["position"] = min(self.TRACK_LENGTH, horse["position"] + movement)
 
         # Ensure all horses have finished
-        for i, horse in enumerate(horses):
+        for _i, horse in enumerate(horses):
             horse["position"] = self.TRACK_LENGTH
 
         # Record results
@@ -260,9 +258,7 @@ class HorseRace(BaseGame):
 
                 # Random movement (2-8 units per update)
                 movement = random.uniform(2.0, 8.0)
-                horse["position"] = min(
-                    self.TRACK_LENGTH, horse["position"] + movement
-                )
+                horse["position"] = min(self.TRACK_LENGTH, horse["position"] + movement)
 
                 # Check if horse finished
                 if horse["position"] >= self.TRACK_LENGTH:
@@ -407,8 +403,7 @@ class HorseRace(BaseGame):
             ),
             "scores": self.state.scores,
             "player_bets": {
-                player_id: data.get("bet")
-                for player_id, data in self.state.player_data.items()
+                player_id: data.get("bet") for player_id, data in self.state.player_data.items()
             },
         }
 

@@ -51,9 +51,7 @@ class GameState:
             "player_data": self.player_data,
             "scores": self.scores,
             "started_at": self.started_at.isoformat() if self.started_at else None,
-            "finished_at": (
-                self.finished_at.isoformat() if self.finished_at else None
-            ),
+            "finished_at": (self.finished_at.isoformat() if self.finished_at else None),
             "winner_id": self.winner_id,
         }
 
@@ -251,9 +249,7 @@ class BaseGame(ABC):
 
         max_score = max(self.state.scores.values())
         winners = [
-            player_id
-            for player_id, score in self.state.scores.items()
-            if score == max_score
+            player_id for player_id, score in self.state.scores.items() if score == max_score
         ]
 
         # Return None if there's a tie

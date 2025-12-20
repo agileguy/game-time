@@ -136,7 +136,9 @@ class GameManager:
 
         # Validate player count
         player_count = len(room.players)
-        logger.info(f"Room {room_code} has {player_count} players: {[p.name for p in room.players]}")
+        logger.info(
+            f"Room {room_code} has {player_count} players: {[p.name for p in room.players]}"
+        )
         if player_count < game_class.min_players():
             raise GameStateError(
                 f"Not enough players. Need at least {game_class.min_players()}",
@@ -269,9 +271,7 @@ class GameManager:
 
         return response
 
-    async def get_state_for_player(
-        self, room_code: str, player_id: str
-    ) -> dict[str, Any]:
+    async def get_state_for_player(self, room_code: str, player_id: str) -> dict[str, Any]:
         """
         Get game state for a specific player.
 
@@ -345,9 +345,7 @@ class GameManager:
         results = await game.get_results()
 
         # Update database
-        room_result = await db.execute(
-            select(Room).filter(Room.code == room_code)
-        )
+        room_result = await db.execute(select(Room).filter(Room.code == room_code))
         room = room_result.scalar_one_or_none()
 
         if room:

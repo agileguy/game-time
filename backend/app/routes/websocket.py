@@ -96,9 +96,7 @@ async def websocket_endpoint(
                 from app.services.game_manager import get_game_manager
 
                 game_manager = get_game_manager()
-                player_state = await game_manager.get_state_for_player(
-                    room_code, session_id
-                )
+                player_state = await game_manager.get_state_for_player(room_code, session_id)
                 await connection_manager.send_personal_message(
                     message={
                         "type": "game_state_update",
@@ -554,7 +552,7 @@ async def handle_message(
 
                     # Create and start game instance
                     game_manager = get_game_manager()
-                    game = await game_manager.create_game(db, room_code, game_type)
+                    await game_manager.create_game(db, room_code, game_type)
                     initial_state = await game_manager.start_game(room_code)
 
                     # Update room status

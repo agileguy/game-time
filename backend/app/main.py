@@ -8,6 +8,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
+# Import to register game manager
+import app.services.game_manager as game_manager_module
 from app.config import settings
 from app.core.logging import get_logger
 from app.database import close_db, init_db
@@ -15,9 +17,6 @@ from app.games.horse_race import HorseRace
 from app.redis_client import redis_client
 from app.routes import games, health, rooms, websocket
 from app.services.game_manager import GameManager, GameRegistry
-
-# Import to register game manager
-import app.services.game_manager as game_manager_module
 
 logger = get_logger()
 
@@ -63,12 +62,16 @@ async def broadcast_game_states():
                                         break
 
                                 if not session_id:
-                                    logger.debug(f"No session_id found for connection {connection_id}")
+                                    logger.debug(
+                                        f"No session_id found for connection {connection_id}"
+                                    )
                                     continue
 
                                 # Get player-specific state
                                 try:
-                                    player_state = await game_manager.get_state_for_player(room_code, session_id)
+                                    player_state = await game_manager.get_state_for_player(
+                                        room_code, session_id
+                                    )
 
                                     # Validate state has required fields
                                     if not player_state or "horses" not in player_state:

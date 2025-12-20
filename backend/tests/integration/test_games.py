@@ -24,9 +24,7 @@ def register_games():
 @pytest.fixture
 async def client() -> AsyncClient:
     """Create HTTP client for API testing."""
-    async with AsyncClient(
-        transport=ASGITransport(app=app), base_url="http://test"
-    ) as client:
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
         yield client
 
 
@@ -179,9 +177,7 @@ class TestGameManager:
         await game_manager.start_game("TEST")
 
         # Invalid action
-        response = await game_manager.handle_player_action(
-            "TEST", "player-0", "invalid_action", {}
-        )
+        response = await game_manager.handle_player_action("TEST", "player-0", "invalid_action", {})
 
         assert response["success"] is False
         assert "error" in response
@@ -211,9 +207,7 @@ class TestGameManager:
         await game_manager.start_game("TEST")
 
         # Place bet
-        await game_manager.handle_player_action(
-            "TEST", "player-0", "place_bet", {"horse_id": 1}
-        )
+        await game_manager.handle_player_action("TEST", "player-0", "place_bet", {"horse_id": 1})
 
         # Get player state
         state = await game_manager.get_state_for_player("TEST", "player-0")
