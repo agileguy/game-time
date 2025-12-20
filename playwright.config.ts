@@ -13,6 +13,8 @@ export default defineConfig({
   // Run tests with 2 workers for faster execution
   workers: 2,
   reporter: 'html',
+  // Increase timeout for game tests that need to wait for full game cycles
+  timeout: 60 * 1000, // 60 seconds per test
 
   use: {
     baseURL: 'http://localhost:7000',

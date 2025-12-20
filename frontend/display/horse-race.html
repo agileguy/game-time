@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Game Time - Horse Race</title>
+
+  <!-- Shared CSS -->
+  <link rel="stylesheet" href="../shared/css/reset.css">
+  <link rel="stylesheet" href="../shared/css/variables.css">
+  <link rel="stylesheet" href="../shared/css/typography.css">
+  <link rel="stylesheet" href="../shared/css/utilities.css">
+
+  <!-- Display CSS -->
+  <link rel="stylesheet" href="css/horse-race.css">
+</head>
+<body class="display-view">
+  <div class="race-container full-screen">
+    <!-- Header -->
+    <header class="race-header">
+      <div class="header-content">
+        <h1 class="game-title">HORSE RACE</h1>
+        <div id="phase-indicator" class="phase-indicator">
+          <span id="phase-text" class="phase-text">Betting Phase</span>
+          <span id="phase-timer" class="phase-timer">15s</span>
+        </div>
+        <div class="connection-status">
+          <span id="connection-indicator" class="connection-dot connected"></span>
+          <span id="connection-text" class="text-sm">Connected</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="race-main">
+      <!-- Betting Phase -->
+      <section id="betting-phase" class="betting-phase">
+        <div class="betting-message">
+          <div class="betting-icon">🎰</div>
+          <div class="betting-text">Place your bets!</div>
+          <div id="betting-countdown" class="betting-countdown">15</div>
+        </div>
+
+        <!-- Horse Preview -->
+        <div id="horse-preview" class="horse-preview">
+          <!-- Horse preview cards will be inserted here -->
+        </div>
+      </section>
+
+      <!-- Race Track -->
+      <section id="race-track" class="race-track hidden">
+        <div class="track-lanes">
+          <!-- Horse lanes will be inserted here -->
+        </div>
+
+        <!-- Finish Line -->
+        <div class="finish-line">
+          <div class="finish-flag">🏁</div>
+        </div>
+      </section>
+
+      <!-- Results -->
+      <section id="results-phase" class="results-phase hidden">
+        <div class="results-header">
+          <div class="results-title">RACE RESULTS</div>
+        </div>
+
+        <div id="results-podium" class="results-podium">
+          <!-- Podium will be inserted here -->
+        </div>
+
+        <div id="player-standings" class="player-standings">
+          <div class="standings-header">Player Scores</div>
+          <div id="standings-list" class="standings-list">
+            <!-- Player scores will be inserted here -->
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="race-footer">
+      <div class="footer-content">
+        <div class="room-info">
+          <span class="text-secondary">Room:</span>
+          <span id="room-code" class="text-primary font-mono">----</span>
+        </div>
+        <div class="round-info">
+          <span id="round-display" class="text-secondary">Round 1 of 1</span>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Scripts -->
+  <script type="module" src="js/horse-race.js"></script>
+</body>
+</html>

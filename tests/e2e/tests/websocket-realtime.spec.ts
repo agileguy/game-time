@@ -1,10 +1,28 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, BrowserContext } from '@playwright/test';
 import { ControllerJoinPage } from '../pages/controller/join.page';
 import { ControllerLobbyPage } from '../pages/controller/lobby.page';
 import { DisplayLobbyPage } from '../pages/display/lobby.page';
 import { testPlayers } from '../fixtures/test-data';
 
 test.describe('WebSocket Real-time Updates', () => {
+  // Track browser contexts for cleanup
+  let contexts: BrowserContext[] = [];
+
+  test.beforeEach(() => {
+    contexts = [];
+  });
+
+  test.afterEach(async () => {
+    // Close all browser contexts to prevent WebSocket connection leaks
+    for (const context of contexts) {
+      try {
+        await context.close();
+      } catch (error) {
+        // Context may already be closed, ignore errors
+      }
+    }
+    contexts = [];
+  });
   test.describe('Connection Management', () => {
     test('should establish WebSocket connection on page load', async ({ page }) => {
       const joinPage = new ControllerJoinPage(page);
@@ -50,6 +68,7 @@ test.describe('WebSocket Real-time Updates', () => {
       // Add players while monitoring connection
       for (let i = 0; i < 3; i++) {
         const playerContext = await browser.newContext();
+      contexts.push(playerContext);
         const playerBrowserPage = await playerContext.newPage();
         const playerJoinPage = new ControllerJoinPage(playerBrowserPage);
 
@@ -68,6 +87,7 @@ test.describe('WebSocket Real-time Updates', () => {
     test('should receive player_joined event in real-time', async ({ browser }) => {
       // Create host
       const hostContext = await browser.newContext();
+      contexts.push(hostContext);
       const hostPage = await hostContext.newPage();
       const hostJoinPage = new ControllerJoinPage(hostPage);
       const hostLobbyPage = new ControllerLobbyPage(hostPage);
@@ -77,6 +97,7 @@ test.describe('WebSocket Real-time Updates', () => {
 
       // Create player
       const playerContext = await browser.newContext();
+      contexts.push(playerContext);
       const playerBrowserPage = await playerContext.newPage();
       const playerJoinPage = new ControllerJoinPage(playerBrowserPage);
 
@@ -98,6 +119,7 @@ test.describe('WebSocket Real-time Updates', () => {
     test('should update player list immediately on join', async ({ browser }) => {
       // Create host
       const hostContext = await browser.newContext();
+      contexts.push(hostContext);
       const hostPage = await hostContext.newPage();
       const hostJoinPage = new ControllerJoinPage(hostPage);
       const hostLobbyPage = new ControllerLobbyPage(hostPage);
@@ -111,6 +133,7 @@ test.describe('WebSocket Real-time Updates', () => {
 
       // Add player
       const playerContext = await browser.newContext();
+      contexts.push(playerContext);
       const playerBrowserPage = await playerContext.newPage();
       const playerJoinPage = new ControllerJoinPage(playerBrowserPage);
 
@@ -131,6 +154,7 @@ test.describe('WebSocket Real-time Updates', () => {
     test('should broadcast join to all connected clients', async ({ browser }) => {
       // Create host
       const hostContext = await browser.newContext();
+      contexts.push(hostContext);
       const hostPage = await hostContext.newPage();
       const hostJoinPage = new ControllerJoinPage(hostPage);
       const hostLobbyPage = new ControllerLobbyPage(hostPage);
@@ -140,6 +164,7 @@ test.describe('WebSocket Real-time Updates', () => {
 
       // Add first player
       const player1Context = await browser.newContext();
+      contexts.push(player1Context);
       const player1Page = await player1Context.newPage();
       const player1JoinPage = new ControllerJoinPage(player1Page);
       const player1LobbyPage = new ControllerLobbyPage(player1Page);
@@ -148,6 +173,7 @@ test.describe('WebSocket Real-time Updates', () => {
 
       // Add second player (should notify both host and player1)
       const player2Context = await browser.newContext();
+      contexts.push(player2Context);
       const player2Page = await player2Context.newPage();
       const player2JoinPage = new ControllerJoinPage(player2Page);
 
@@ -169,6 +195,7 @@ test.describe('WebSocket Real-time Updates', () => {
     test('should receive player_left event in real-time', async ({ browser }) => {
       // Create host
       const hostContext = await browser.newContext();
+      contexts.push(hostContext);
       const hostPage = await hostContext.newPage();
       const hostJoinPage = new ControllerJoinPage(hostPage);
       const hostLobbyPage = new ControllerLobbyPage(hostPage);
@@ -178,6 +205,7 @@ test.describe('WebSocket Real-time Updates', () => {
 
       // Add player
       const playerContext = await browser.newContext();
+      contexts.push(playerContext);
       const playerBrowserPage = await playerContext.newPage();
       const playerJoinPage = new ControllerJoinPage(playerBrowserPage);
       const playerLobbyPage = new ControllerLobbyPage(playerBrowserPage);
@@ -203,6 +231,7 @@ test.describe('WebSocket Real-time Updates', () => {
     test('should update player count immediately on leave', async ({ browser }) => {
       // Create host
       const hostContext = await browser.newContext();
+      contexts.push(hostContext);
       const hostPage = await hostContext.newPage();
       const hostJoinPage = new ControllerJoinPage(hostPage);
       const hostLobbyPage = new ControllerLobbyPage(hostPage);
@@ -212,6 +241,7 @@ test.describe('WebSocket Real-time Updates', () => {
 
       // Add player
       const playerContext = await browser.newContext();
+      contexts.push(playerContext);
       const playerBrowserPage = await playerContext.newPage();
       const playerJoinPage = new ControllerJoinPage(playerBrowserPage);
       const playerLobbyPage = new ControllerLobbyPage(playerBrowserPage);
@@ -241,6 +271,7 @@ test.describe('WebSocket Real-time Updates', () => {
     test('should receive host_transferred event when host leaves', async ({ browser }) => {
       // Create host
       const hostContext = await browser.newContext();
+      contexts.push(hostContext);
       const hostPage = await hostContext.newPage();
       const hostJoinPage = new ControllerJoinPage(hostPage);
       const hostLobbyPage = new ControllerLobbyPage(hostPage);
@@ -250,6 +281,7 @@ test.describe('WebSocket Real-time Updates', () => {
 
       // Add player
       const playerContext = await browser.newContext();
+      contexts.push(playerContext);
       const playerBrowserPage = await playerContext.newPage();
       const playerJoinPage = new ControllerJoinPage(playerBrowserPage);
       const playerLobbyPage = new ControllerLobbyPage(playerBrowserPage);
@@ -279,6 +311,7 @@ test.describe('WebSocket Real-time Updates', () => {
     test('should receive player_kicked event immediately', async ({ browser }) => {
       // Create host
       const hostContext = await browser.newContext();
+      contexts.push(hostContext);
       const hostPage = await hostContext.newPage();
       const hostJoinPage = new ControllerJoinPage(hostPage);
       const hostLobbyPage = new ControllerLobbyPage(hostPage);
@@ -288,12 +321,14 @@ test.describe('WebSocket Real-time Updates', () => {
 
       // Add players
       const player1Context = await browser.newContext();
+      contexts.push(player1Context);
       const player1Page = await player1Context.newPage();
       const player1JoinPage = new ControllerJoinPage(player1Page);
       const player1LobbyPage = new ControllerLobbyPage(player1Page);
       await player1JoinPage.joinRoom(roomCode, testPlayers.player1.name);
 
       const player2Context = await browser.newContext();
+      contexts.push(player2Context);
       const player2Page = await player2Context.newPage();
       const player2JoinPage = new ControllerJoinPage(player2Page);
       const player2LobbyPage = new ControllerLobbyPage(player2Page);
@@ -325,6 +360,7 @@ test.describe('WebSocket Real-time Updates', () => {
     test('should receive game_starting event with countdown', async ({ browser }) => {
       // Create host
       const hostContext = await browser.newContext();
+      contexts.push(hostContext);
       const hostPage = await hostContext.newPage();
       const hostJoinPage = new ControllerJoinPage(hostPage);
       const hostLobbyPage = new ControllerLobbyPage(hostPage);
@@ -334,6 +370,7 @@ test.describe('WebSocket Real-time Updates', () => {
 
       // Add player
       const playerContext = await browser.newContext();
+      contexts.push(playerContext);
       const playerBrowserPage = await playerContext.newPage();
       const playerJoinPage = new ControllerJoinPage(playerBrowserPage);
       const playerLobbyPage = new ControllerLobbyPage(playerBrowserPage);
@@ -359,6 +396,7 @@ test.describe('WebSocket Real-time Updates', () => {
     test('should broadcast game start to all clients including display', async ({ browser }) => {
       // Create host
       const hostContext = await browser.newContext();
+      contexts.push(hostContext);
       const hostPage = await hostContext.newPage();
       const hostJoinPage = new ControllerJoinPage(hostPage);
       const hostLobbyPage = new ControllerLobbyPage(hostPage);
@@ -368,6 +406,7 @@ test.describe('WebSocket Real-time Updates', () => {
 
       // Add player
       const playerContext = await browser.newContext();
+      contexts.push(playerContext);
       const playerBrowserPage = await playerContext.newPage();
       const playerJoinPage = new ControllerJoinPage(playerBrowserPage);
       const playerLobbyPage = new ControllerLobbyPage(playerBrowserPage);
@@ -375,6 +414,7 @@ test.describe('WebSocket Real-time Updates', () => {
 
       // Create a display player session first
       const displaySetupContext = await browser.newContext();
+      contexts.push(displaySetupContext);
       const displaySetupPage = await displaySetupContext.newPage();
       const displayJoinPage = new ControllerJoinPage(displaySetupPage);
       await displayJoinPage.joinRoom(roomCode, 'Display');
@@ -385,6 +425,7 @@ test.describe('WebSocket Real-time Updates', () => {
 
       // Add display with valid session
       const displayContext = await browser.newContext();
+      contexts.push(displayContext);
       const displayBrowserPage = await displayContext.newPage();
       const displayPage = new DisplayLobbyPage(displayBrowserPage);
       await displayPage.goto();
@@ -420,6 +461,7 @@ test.describe('WebSocket Real-time Updates', () => {
     test('should keep room state in sync across multiple events', async ({ browser }) => {
       // Create host
       const hostContext = await browser.newContext();
+      contexts.push(hostContext);
       const hostPage = await hostContext.newPage();
       const hostJoinPage = new ControllerJoinPage(hostPage);
       const hostLobbyPage = new ControllerLobbyPage(hostPage);
@@ -433,6 +475,7 @@ test.describe('WebSocket Real-time Updates', () => {
 
       for (let i = 0; i < 3; i++) {
         const playerContext = await browser.newContext();
+      contexts.push(playerContext);
         const playerBrowserPage = await playerContext.newPage();
         const playerJoinPage = new ControllerJoinPage(playerBrowserPage);
         const playerLobbyPage = new ControllerLobbyPage(playerBrowserPage);
@@ -485,6 +528,7 @@ test.describe('WebSocket Real-time Updates', () => {
     test('should process events in correct order', async ({ browser }) => {
       // Create host
       const hostContext = await browser.newContext();
+      contexts.push(hostContext);
       const hostPage = await hostContext.newPage();
       const hostJoinPage = new ControllerJoinPage(hostPage);
       const hostLobbyPage = new ControllerLobbyPage(hostPage);
@@ -495,6 +539,7 @@ test.describe('WebSocket Real-time Updates', () => {
       // Add multiple players in sequence
       for (let i = 0; i < 3; i++) {
         const playerContext = await browser.newContext();
+      contexts.push(playerContext);
         const playerBrowserPage = await playerContext.newPage();
         const playerJoinPage = new ControllerJoinPage(playerBrowserPage);
 

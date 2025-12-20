@@ -17,6 +17,8 @@ class LobbyController {
     this.roomCode = null;
     this.playerId = null;
     this.isHost = false;
+    this.selectedGame = null;
+    this.availableGames = [];
     this.init();
   }
 
@@ -53,6 +55,10 @@ class LobbyController {
       // Player info
       playerName: document.getElementById('player-name'),
       hostBadge: document.getElementById('host-badge'),
+
+      // Game selection
+      gameSelectionSection: document.getElementById('game-selection-section'),
+      gamesGrid: document.getElementById('games-grid'),
 
       // Players section
       playerCount: document.getElementById('player-count'),
@@ -116,13 +122,6 @@ class LobbyController {
     appState.subscribe('isHost', (isHost) => {
       this.isHost = isHost;
       this.updateHostControls();
-    });
-
-    // Subscribe to room status changes
-    appState.subscribe('roomStatus', (status) => {
-      if (status === 'playing') {
-        this.handleGameStarted();
-      }
     });
   }
 
@@ -199,10 +198,16 @@ class LobbyController {
       }
     });
 
-    // Game starting (with countdown)
+    // Game starting (countdown)
     this.ws.on('game_starting', (data) => {
       logger.info('Game starting:', data);
-      this.handleGameStarted();
+      notifications.success('Starting game...');
+    });
+
+    // Game started
+    this.ws.on('game_started', (data) => {
+      logger.info('Game started:', data);
+      this.handleGameStarted(data.game_type);
     });
 
     // Error messages
@@ -224,6 +229,13 @@ class LobbyController {
   handleRoomState(data) {
     logger.debug('Updating room state:', data);
 
+    // Find current player
+    const currentPlayer = data.players?.find((p) => p.session_id === this.sessionId);
+
+    // Capture host status BEFORE state updates trigger subscriptions
+    const wasHost = this.isHost;
+    const isNowHost = currentPlayer?.is_host || false;
+
     // Update state
     appState.update({
       roomCode: data.room_code,
@@ -231,9 +243,6 @@ class LobbyController {
       players: data.players || [],
       maxPlayers: data.max_players || 12,
     });
-
-    // Find current player
-    const currentPlayer = data.players?.find((p) => p.session_id === this.sessionId);
 
     if (currentPlayer) {
       this.playerId = currentPlayer.id;
@@ -247,10 +256,28 @@ class LobbyController {
       this.elements.roomCode.textContent = data.room_code;
       this.elements.playerName.textContent = currentPlayer.name;
 
+      // Use the captured values
+      this.isHost = isNowHost;
+
+      logger.info('Host check:', { wasHost, isHost: this.isHost, availableGamesCount: this.availableGames.length });
+
       if (currentPlayer.is_host) {
         this.elements.hostBadge.classList.remove('hidden');
+
+        // Fetch games if just became host
+        if (!wasHost && this.availableGames.length === 0) {
+          logger.info('Fetching available games...');
+          this.fetchAvailableGames();
+        } else if (wasHost) {
+          // Re-render game selection if already host
+          logger.info('Re-rendering game selection');
+          this.renderGameSelection();
+        } else {
+          logger.warn('Not fetching games - wasHost:', wasHost, 'availableGames:', this.availableGames.length);
+        }
       } else {
         this.elements.hostBadge.classList.add('hidden');
+        this.elements.gameSelectionSection?.classList.add('hidden');
       }
     }
   }
@@ -332,11 +359,104 @@ class LobbyController {
     const connectedPlayers = players.filter((p) => p.connected);
     const minPlayers = CONFIG.room.minPlayers;
 
-    if (connectedPlayers.length >= minPlayers) {
+    // Enable if: game selected AND enough players
+    if (this.selectedGame && connectedPlayers.length >= minPlayers) {
       this.elements.startGameBtn.disabled = false;
     } else {
       this.elements.startGameBtn.disabled = true;
     }
+  }
+
+  /**
+   * Fetch available games from API
+   */
+  async fetchAvailableGames() {
+    try {
+      const url = `${CONFIG.api.baseUrl}/api/games`;
+      logger.info('Fetching games from:', url);
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error('Failed to fetch games');
+      }
+      const data = await response.json();
+      this.availableGames = data.games || [];
+      logger.info('Available games:', this.availableGames);
+
+      if (this.isHost) {
+        this.renderGameSelection();
+      }
+    } catch (error) {
+      logger.error('Failed to fetch games:', error);
+      notifications.error('Failed to load available games');
+    }
+  }
+
+  /**
+   * Render game selection UI
+   */
+  renderGameSelection() {
+    if (!this.isHost || !this.elements.gamesGrid) return;
+
+    // Show game selection section
+    this.elements.gameSelectionSection?.classList.remove('hidden');
+
+    // Clear existing games
+    this.elements.gamesGrid.innerHTML = '';
+
+    // Game icons map
+    const gameIcons = {
+      horse_race: '🐴',
+      trivia: '🎯',
+      memory: '🧠'
+    };
+
+    // Render each game
+    this.availableGames.forEach((game) => {
+      const gameCard = document.createElement('div');
+      gameCard.className = 'game-card';
+      gameCard.dataset.gameType = game.type;
+
+      const icon = gameIcons[game.type] || '🎮';
+
+      gameCard.innerHTML = `
+        <div class="game-card-icon">${icon}</div>
+        <div class="game-card-name">${game.name}</div>
+        <div class="game-card-players">${game.min_players}-${game.max_players} players</div>
+      `;
+
+      gameCard.addEventListener('click', () => {
+        this.selectGame(game.type);
+      });
+
+      this.elements.gamesGrid.appendChild(gameCard);
+    });
+
+    // Select first game by default if none selected
+    if (!this.selectedGame && this.availableGames.length > 0) {
+      this.selectGame(this.availableGames[0].type);
+    }
+  }
+
+  /**
+   * Select a game
+   */
+  selectGame(gameType) {
+    this.selectedGame = gameType;
+
+    // Update UI
+    const allCards = this.elements.gamesGrid?.querySelectorAll('.game-card');
+    allCards?.forEach((card) => {
+      if (card.dataset.gameType === gameType) {
+        card.classList.add('selected');
+      } else {
+        card.classList.remove('selected');
+      }
+    });
+
+    logger.info('Selected game:', gameType);
+
+    // Update start button state
+    this.updateStartGameButton(appState.get('players') || []);
   }
 
   /**
@@ -348,6 +468,11 @@ class LobbyController {
       return;
     }
 
+    if (!this.selectedGame) {
+      notifications.error('Please select a game first');
+      return;
+    }
+
     const players = appState.get('players') || [];
     const connectedPlayers = players.filter((p) => p.connected);
 
@@ -356,8 +481,8 @@ class LobbyController {
       return;
     }
 
-    // Send start game message
-    this.ws.send('start_game');
+    // Send start game message with game type
+    this.ws.send('start_game', { game_type: this.selectedGame });
     // Note: Don't show notification here - game_starting event will handle it
   }
 
@@ -413,14 +538,16 @@ class LobbyController {
 
   /**
    * Handle game started
+   * @param {string} gameType - Type of game (e.g., 'horse_race')
    */
-  handleGameStarted() {
+  handleGameStarted(gameType) {
     notifications.success('Starting game...');
 
     // Redirect to game view
     setTimeout(() => {
-      // TODO: Redirect to appropriate game view
-      notifications.info('Game views not yet implemented');
+      // Convert game_type to filename (e.g., 'horse_race' -> 'horse-race.html')
+      const gameFileName = gameType.replace(/_/g, '-');
+      window.location.href = `${gameFileName}.html`;
     }, 1500);
   }
 }
