@@ -181,18 +181,27 @@ export class DisplayHorseRacePage {
   }
 
   async waitForRaceStart(timeout: number = 20000) {
-    // Wait for horses to start moving (position > 0)
+    // Wait for race track to be visible with horse sprites
+    await this.page.waitForSelector('.horse-sprite', { state: 'visible', timeout });
+
+    // Wait a moment for positions to start updating
+    await this.page.waitForTimeout(1500);
+
+    // Verify at least one horse has moved from starting position
     await this.page.waitForFunction(
       () => {
         const sprites = document.querySelectorAll('.horse-sprite');
+        if (sprites.length === 0) return false;
+
         return Array.from(sprites).some((sprite) => {
-          const style = (sprite as HTMLElement).style.left;
-          const position = parseFloat(style);
-          return position > 0;
+          const left = (sprite as HTMLElement).style.left;
+          if (!left) return false;
+          const position = parseFloat(left);
+          return !isNaN(position) && position > 0;
         });
       },
       {},
-      { timeout }
+      { timeout: timeout - 1500 }
     );
   }
 
