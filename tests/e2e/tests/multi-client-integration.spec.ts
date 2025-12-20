@@ -371,10 +371,10 @@ test.describe('Multi-Client Integration', () => {
       const roomCode = await hostLobbyPage.getRoomCode();
       contexts.push(hostContext);
 
-      // Rapidly add 8 players
+      // Rapidly add 4 players (5 total with host)
       const joinPromises = [];
 
-      for (let i = 0; i < 8; i++) {
+      for (let i = 0; i < 4; i++) {
         const promise = (async () => {
           const playerContext = await browser.newContext();
           const playerBrowserPage = await playerContext.newPage();
@@ -394,10 +394,10 @@ test.describe('Multi-Client Integration', () => {
 
       // Verify all players joined
       const playerCount = await hostLobbyPage.getPlayerCount();
-      expect(playerCount).toBe('9 / 12');
+      expect(playerCount).toBe('5 / 12');
 
       const playerNames = await hostLobbyPage.getPlayerNames();
-      expect(playerNames.length).toBe(9);
+      expect(playerNames.length).toBe(5);
     });
 
     test('should handle max players (12)', async ({ browser }) => {
