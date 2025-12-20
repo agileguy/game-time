@@ -58,7 +58,9 @@ async def broadcast_game_states():
                                 await game_manager.finish_game(db, room_code)
                                 await db.commit()
                         except Exception as e:
-                            logger.error(f"Error finishing game in room {room_code}: {e}", exc_info=True)
+                            logger.error(
+                                f"Error finishing game in room {room_code}: {e}", exc_info=True
+                            )
 
                 # Get all active games
                 for room_code in list(game_manager._active_games.keys()):
