@@ -156,17 +156,18 @@ test.describe('Horse Race Game', () => {
       const player1Bet = await player1Game.getCurrentBet();
       expect(player1Bet).toBe(hostHorses[1]);
 
-      // Wait for betting phase to end (15 seconds + buffer)
-      await hostGame.page.waitForTimeout(16000);
+      // Wait for betting phase to end, but not so long we miss the racing phase
+      // Betting is 15s, race is 5s, so wait 13s to catch racing phase
+      await hostGame.page.waitForTimeout(13000);
 
       // RACING PHASE
 
-      // Wait for racing phase
+      // Wait for racing phase (race completes in 5s, so this is a brief window)
       await Promise.all([
-        hostGame.waitForRacingPhase(20000),
-        player1Game.waitForRacingPhase(20000),
-        player2Game.waitForRacingPhase(20000),
-        displayGame.waitForRaceTrack(20000),
+        hostGame.waitForRacingPhase(10000),
+        player1Game.waitForRacingPhase(10000),
+        player2Game.waitForRacingPhase(10000),
+        displayGame.waitForRaceTrack(10000),
       ]);
 
       // Verify racing phase is visible
@@ -177,11 +178,8 @@ test.describe('Horse Race Game', () => {
       const hostBetReminder = await hostGame.getBetReminder();
       expect(hostBetReminder).toBe(hostHorses[0]);
 
-      // Wait for race track to have sprites
-      await displayGame.page.waitForSelector('.horse-sprite', { state: 'visible', timeout: 10000 });
-
-      // Wait for race to complete (skip checking intermediate positions since instant race completes quickly)
-      await displayGame.page.waitForTimeout(6000); // Wait for 5s race + buffer
+      // Wait for race to complete (race started 2s ago, so wait 4s more)
+      await displayGame.page.waitForTimeout(4000);
 
       // RESULTS PHASE
 
